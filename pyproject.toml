@@ -1,0 +1,40 @@
+# ### Archivo: pyproject.toml ###
+# Autor: Juan Camilo Agudelo (Jagudelo14)
+# Correo: camiloagu1401@gmail.com
+# Fecha: 2026-11-16
+# Descripción: Dependencias y configuración del agente analista de SECOP II
+
+[project]
+name = "secop-agent"
+version = "0.1.0"
+description = "Agente que responde preguntas sobre contratos públicos de SECOP II y marca patrones para revisar"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "anthropic>=1.0",
+    "httpx>=0.27",
+    "pandas>=2.2",
+    "mcp>=2.0",
+    "python-dotenv>=1.0",
+]
+
+[project.optional-dependencies]
+demo = ["streamlit>=1.40"]
+
+[dependency-groups]
+dev = ["pytest>=8.3"]
+
+[project.scripts]
+secop-agent = "secop_agent.__main__:main"
+secop-mcp = "secop_agent.mcp_server:main"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/secop_agent"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
