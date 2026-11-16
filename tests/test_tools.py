@@ -55,3 +55,59 @@ def test_ejecutar_herramienta_desconocida():
 def test_definiciones_coinciden_con_funciones():
     nombres = {h["name"] for h in tools.HERRAMIENTAS}
     assert nombres == set(tools.FUNCIONES)
+
+
+def test_agregar_por_modalidad_trae_enlaces(monkeypatch, filas_reales):
+    consultas = []
+
+    def falso_consultar(params):
+        consultas.append(params)
+        if "$group" in params:
+            return [{"clave": "Contratación directa", "num_contratos": "5", "total_valor": "100", "total_pagado": "0"}]
+        if "count(*)" in params.get("$select", ""):
+            return [{"num_contratos": "5", "total_valor": "100", "total_pagado": "0"}]
+        return filas_reales[: params.get("$limit", 1000)]
+
+    monkeypatch.setattr(socrata, "consultar", falso_consultar)
+    r = tools.agregar({"anio": 2024}, "modalidad", top=5)
+
+    mayores = r["grupos"][0]["contratos_mayores"]
+    assert len(mayores) == 3
+    assert all(c["url"].startswith("https://") for c in mayores)
+    # filtro del grupo en la consulta
+    assert "modalidad_de_contratacion = 'Contratación directa'" in consultas[-1]["$where"]
+
+
+def test_agregar_promedio_y_contratistas_distintos(monkeypatch):
+    consultas = []
+
+    def falso_consultar(params):
+        consultas.append(params)
+        fila = {"clave": "Bogotá", "num_contratos": "4", "total_valor": "400", "total_pagado": "0",
+                "promedio_valor": "100", "contratistas_distintos": "3"}
+        if "$group" in params:
+            return [fila]
+        if "avg(" in params.get("$select", ""):
+            return [fila]
+        return []
+
+    monkeypatch.setattr(socrata, "consultar", falso_consultar)
+    r = tools.agregar({}, "ciudad", metrica="contratistas_distintos", top=5)
+
+    assert r["total_general"]["promedio_valor"] == 100
+    assert r["total_general"]["contratistas_distintos"] == 3
+    assert r["grupos"][0]["contratistas_distintos"] == 3
+    assert consultas[0]["$order"].startswith("contratistas_distintos DESC")
+
+
+def test_buscar_entidad_marca_dependencias(monkeypatch):
+    filas = [
+        {"nombre_entidad": "ENTIDAD EJEMPLO - SECRETARIA UNO", "codigo_entidad": "1", "num_contratos": "5"},
+        {"nombre_entidad": "ENTIDAD EJEMPLO - SECRETARIA DOS", "codigo_entidad": "2", "num_contratos": "4"},
+        {"nombre_entidad": "OTRA ENTIDAD", "codigo_entidad": "3", "num_contratos": "3"},
+    ]
+    monkeypatch.setattr(socrata, "consultar", lambda params: filas)
+    r = tools.buscar_entidad("entidad")
+
+    assert r["dependencias"][0]["inicio_nombre"] == "ENTIDAD EJEMPLO"
+    assert r["dependencias"][0]["num_entidades"] == 2

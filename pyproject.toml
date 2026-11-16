@@ -16,6 +16,7 @@ dependencies = [
     "pandas>=2.2",
     "mcp>=2.0",
     "python-dotenv>=1.0",
+    "google-genai>=3.3.0",
 ]
 
 [project.optional-dependencies]

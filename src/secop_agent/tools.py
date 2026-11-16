@@ -30,13 +30,26 @@ AGRUPACIONES = {
     "tipo_de_contrato": {"clave": "tipo_de_contrato", "nombre": None},
     "departamento": {"clave": "departamento", "nombre": None},
     "anio": {"clave": "date_extract_y(fecha_de_firma)", "nombre": None},
+    "ciudad": {"clave": "ciudad", "nombre": None},
+    "sector": {"clave": "sector", "nombre": None},
 }
 
 METRICAS = {
     "suma_valor": "total_valor",
     "conteo": "num_contratos",
     "suma_pagado": "total_pagado",
+    "promedio_valor": "promedio_valor",
+    "contratistas_distintos": "contratistas_distintos",
 }
+
+# columnas de cada métrica
+COLUMNAS_METRICAS = [
+    "count(*) as num_contratos",
+    "sum(valor_del_contrato) as total_valor",
+    "sum(valor_pagado) as total_pagado",
+    "avg(valor_del_contrato) as promedio_valor",
+    "count(distinct documento_proveedor) as contratistas_distintos",
+]
 
 
 # ### Resolver lugares ###
@@ -92,7 +105,8 @@ def buscar_entidad(nombre, limite=10):
 
     return {
         "nota": "codigo_entidad identifica una sola entidad; varias entidades pueden compartir NIT",
-        "sugerencia": None if filas else "Sin resultados: intenta con menos palabras o sin 'alcaldia'/'gobernacion' (ej: 'medellin', 'distrito medellin', 'departamento antioquia')",
+        "sugerencia": None if filas else "Sin resultados: intenta con menos palabras o quita las palabras genéricas del tipo de entidad",
+        "dependencias": _dependencias(filas),
         "candidatas": [
             {
                 "nombre_entidad": f.get("nombre_entidad"),
@@ -105,6 +119,27 @@ def buscar_entidad(nombre, limite=10):
             for f in filas
         ],
     }
+
+
+def _dependencias(filas):
+    # inicio antes del guion
+    grupos = {}
+    for f in filas:
+        nombre = f.get("nombre_entidad") or ""
+        if "-" not in nombre:
+            continue
+        inicio = nombre.split("-")[0].strip()
+        if len(inicio) >= 5:
+            grupos.setdefault(inicio, set()).add(f.get("codigo_entidad"))
+    # dos o más comparten inicio
+    return [
+        {
+            "inicio_nombre": inicio,
+            "num_entidades": len(codigos),
+            "nota": "Parecen dependencias de una misma entidad; para tomarlas juntas usa el filtro nombre_entidad_empieza con este inicio",
+        }
+        for inicio, codigos in grupos.items() if len(codigos) >= 2
+    ]
 
 
 # ### consultar_contratos ###
@@ -157,11 +192,7 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
         columnas.append(f"max({grupo['nombre']}) as nombre")
     if agrupar_por == "proveedor":
         columnas.append("max(tipodocproveedor) as tipo_documento")
-    columnas += [
-        "count(*) as num_contratos",
-        "sum(valor_del_contrato) as total_valor",
-        "sum(valor_pagado) as total_pagado",
-    ]
+    columnas += COLUMNAS_METRICAS
 
     # ranking agrupado en servidor
     filas = socrata.consultar({
@@ -174,7 +205,7 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
 
     # total sin agrupar
     general = socrata.consultar({
-        "$select": "count(*) as num_contratos, sum(valor_del_contrato) as total_valor, sum(valor_pagado) as total_pagado",
+        "$select": ", ".join(COLUMNAS_METRICAS),
         "$where": where,
     })
 
@@ -190,12 +221,17 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
             "num_contratos": int(a_numero(f.get("num_contratos"))),
             "total_valor": a_numero(f.get("total_valor")),
             "total_pagado": a_numero(f.get("total_pagado")),
+            "promedio_valor": round(a_numero(f.get("promedio_valor")), 2),
+            "contratistas_distintos": int(a_numero(f.get("contratistas_distintos"))),
             "_clave_real": f.get("clave"),
         })
 
-    # enlaces solo proveedor o entidad
-    if incluir_enlaces and agrupar_por in ("proveedor", "entidad") and grupos:
-        _agregar_enlaces(grupos, where, grupo["clave"])
+    if incluir_enlaces and grupos:
+        if agrupar_por in ("proveedor", "entidad"):
+            _agregar_enlaces(grupos, where, grupo["clave"])
+        else:
+            # pocos grupos, consulta por grupo
+            _enlaces_por_grupo(grupos, where, grupo["clave"], numerica=agrupar_por == "anio")
 
     for g in grupos:
         # quitar clave interna
@@ -209,6 +245,8 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
             "num_contratos": int(a_numero(totales.get("num_contratos"))),
             "total_valor": a_numero(totales.get("total_valor")),
             "total_pagado": a_numero(totales.get("total_pagado")),
+            "promedio_valor": round(a_numero(totales.get("promedio_valor")), 2),
+            "contratistas_distintos": int(a_numero(totales.get("contratistas_distintos"))),
         },
         "grupos": grupos,
     }
@@ -238,6 +276,26 @@ def _agregar_enlaces(grupos, where, columna_clave, por_grupo=3):
 
     for g in grupos:
         g["contratos_mayores"] = enlaces.get(g["_clave_real"], [])
+
+
+def _enlaces_por_grupo(grupos, where, columna_clave, numerica=False, por_grupo=3, max_grupos=20):
+    for g in grupos[:max_grupos]:
+        clave = g["_clave_real"]
+        if clave is None:
+            g["contratos_mayores"] = []
+            continue
+        valor = int(a_numero(clave)) if numerica else texto_soql(clave)
+        # top 3 del grupo
+        filas = socrata.consultar({
+            "$select": "id_contrato, valor_del_contrato, urlproceso",
+            "$where": f"{where} AND {columna_clave} = {valor}",
+            "$order": "valor_del_contrato DESC, id_contrato",
+            "$limit": por_grupo,
+        })
+        g["contratos_mayores"] = [
+            {"id_contrato": f.get("id_contrato"), "valor": a_numero(f.get("valor_del_contrato")), "url": limpiar_contrato(f)["url"]}
+            for f in filas
+        ]
 
 
 # ### detectar_alertas ###
@@ -284,13 +342,22 @@ ESQUEMA_FILTROS = {
     "type": "object",
     "description": "Filtros opcionales. Siempre se excluyen contratos en estado Borrador o Cancelado.",
     "properties": {
-        "codigo_entidad": {"type": "string", "description": "Código único de la entidad (sale de buscar_entidad). Preferir sobre nit_entidad."},
+        "codigo_entidad": {
+            "anyOf": [{"type": "string"}, {"type": "array", "items": {"type": "string"}}],
+            "description": "Código único de la entidad (sale de buscar_entidad), o una lista de códigos para tomar varias entidades juntas. Preferir sobre nit_entidad.",
+        },
+        "nombre_entidad_empieza": {"type": "string", "description": "Toma todas las entidades cuyo nombre empieza con este texto (sin importar tildes). Sirve cuando una entidad está registrada como varias dependencias que comparten el inicio del nombre."},
         "nit_entidad": {"type": "string", "description": "NIT de la entidad. Ojo: varias entidades pueden compartirlo."},
-        "anio": {"type": "integer", "description": "Año de la fecha de firma"},
+        "anio": {"type": "integer", "description": "Un solo año de la fecha de firma"},
+        "anio_desde": {"type": "integer", "description": "Primer año de un rango de fechas de firma (incluido). No combinar con anio."},
+        "anio_hasta": {"type": "integer", "description": "Último año de un rango de fechas de firma (incluido). No combinar con anio."},
+        "objeto_contiene": {"type": "array", "items": {"type": "string"}, "description": "Palabras a buscar en el objeto del contrato, sin importar tildes. Basta con que aparezca una."},
+        "tipo_persona": {"type": "string", "enum": ["natural", "juridica"], "description": "Tipo de contratista: natural (documento personal) o juridica (NIT)."},
+        "duracion_min_dias": {"type": "integer", "description": "Duración mínima del contrato en días, calculada entre la fecha de inicio y la de fin."},
         "modalidades": {"type": "array", "items": {"type": "string", "enum": MODALIDADES}, "description": "Contratación directa = ['Contratación directa', 'Contratación Directa (con ofertas)']"},
         "tipo_de_contrato": {"type": "string", "enum": TIPOS_CONTRATO},
-        "departamento": {"type": "string", "description": "Nombre completo, sin importar tildes. Ej: 'Antioquia', 'Valle del Cauca', 'Distrito Capital de Bogotá'"},
-        "ciudad": {"type": "string", "description": "Nombre completo, sin importar tildes. Ej: 'Medellín', 'Bogotá'"},
+        "departamento": {"type": "string", "description": "Nombre completo del departamento, sin importar tildes; se compara contra los valores reales de SECOP"},
+        "ciudad": {"type": "string", "description": "Nombre completo de la ciudad, sin importar tildes; se compara contra los valores reales de SECOP"},
         "documento_proveedor": {"type": "string", "description": "NIT o cédula del contratista, solo dígitos"},
         "valor_min": {"type": "number", "description": "Valor mínimo del contrato en pesos"},
         "valor_max": {"type": "number", "description": "Valor máximo del contrato en pesos"},
@@ -302,11 +369,11 @@ ESQUEMA_FILTROS = {
 HERRAMIENTAS = [
     {
         "name": "buscar_entidad",
-        "description": "Busca entidades compradoras por nombre (sin importar tildes ni mayúsculas) y devuelve candidatas con codigo_entidad, NIT y número de contratos. Úsala antes de filtrar por entidad. Si hay varias candidatas plausibles, pide aclaración al usuario.",
+        "description": "Busca entidades compradoras por nombre (sin importar tildes ni mayúsculas) y devuelve candidatas con codigo_entidad, NIT y número de contratos. Úsala antes de filtrar por entidad. Si hay varias candidatas que son entidades distintas, pide aclaración al usuario. Si el campo dependencias indica que son partes de una misma entidad, puedes tomarlas juntas.",
         "input_schema": {
             "type": "object",
             "properties": {
-                "nombre": {"type": "string", "description": "Palabras clave del nombre, ej: 'secretaria general alcaldia bogota'"},
+                "nombre": {"type": "string", "description": "Palabras clave del nombre de la entidad"},
                 "limite": {"type": "integer", "default": 10},
             },
             "required": ["nombre"],
@@ -327,16 +394,24 @@ HERRAMIENTAS = [
     },
     {
         "name": "agregar",
-        "description": "Suma o cuenta contratos agrupando en el servidor (rankings, totales por grupo). Devuelve el top de grupos, el total general y los contratos mayores de cada grupo con su enlace. Para cuántos contratos o cuánto dinero en total usa el campo total_general.",
+        "description": "Suma, cuenta o promedia contratos agrupando en el servidor (rankings, totales por grupo). Devuelve el top de grupos, el total general y los contratos mayores de cada grupo con su enlace. El total sin agrupar viene en el campo total_general, con conteo, suma, pagado, promedio y contratistas distintos.",
         "input_schema": {
             "type": "object",
             "properties": {
                 "filtros": ESQUEMA_FILTROS,
                 "agrupar_por": {"type": "string", "enum": list(AGRUPACIONES)},
-                "metrica": {"type": "string", "enum": list(METRICAS), "default": "suma_valor"},
+                "metrica": {
+                    "type": "string",
+                    "enum": list(METRICAS),
+                    "description": (
+                        "Cómo se ordena el ranking. conteo = número de contratos. "
+                        "suma_valor = valor total contratado. suma_pagado = valor ya pagado. "
+                        "promedio_valor = valor promedio por contrato. contratistas_distintos = número de contratistas diferentes."
+                    ),
+                },
                 "top": {"type": "integer", "default": 10},
             },
-            "required": ["filtros", "agrupar_por"],
+            "required": ["filtros", "agrupar_por", "metrica"],
         },
     },
     {

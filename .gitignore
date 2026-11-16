@@ -12,3 +12,5 @@ __pycache__/
 .cache/
 evals/resultados/
 docs/muestra.json
+.env.*
+!.env.example

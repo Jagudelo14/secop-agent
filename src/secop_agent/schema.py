@@ -66,8 +66,14 @@ ESTADOS_EXCLUIDOS = ["Borrador", "Cancelado"]
 
 FILTROS_PERMITIDOS = {
     "codigo_entidad",
+    "nombre_entidad_empieza",
     "nit_entidad",
     "anio",
+    "anio_desde",
+    "anio_hasta",
+    "objeto_contiene",
+    "tipo_persona",
+    "duracion_min_dias",
     "modalidades",
     "tipo_de_contrato",
     "departamento",
@@ -79,6 +85,11 @@ FILTROS_PERMITIDOS = {
 }
 
 AVISO_ALERTA = "patrón para revisar, no implica irregularidad"
+
+# documentos de persona jurídica
+DOCUMENTOS_JURIDICA = ["NIT"]
+# sin tipo claro
+DOCUMENTOS_SIN_TIPO = ["Otro", "No Definido"]
 
 
 # ### Normalización ###
@@ -177,19 +188,60 @@ def validar_filtros(filtros):
 
     limpios = {}
     # ids solo dígitos
-    for campo in ("codigo_entidad", "nit_entidad", "documento_proveedor"):
+    for campo in ("nit_entidad", "documento_proveedor"):
         if filtros.get(campo):
             valor = normalizar_documento(filtros[campo])
             if not valor:
                 raise ValueError(f"{campo} debe tener dígitos")
             limpios[campo] = valor
 
-    if filtros.get("anio") is not None:
-        anio = int(filtros["anio"])
-        # secop ii desde 2015
-        if not 2015 <= anio <= datetime.now().year:
-            raise ValueError(f"Año fuera de rango: {anio}")
-        limpios["anio"] = anio
+    # una o varias entidades
+    if filtros.get("codigo_entidad"):
+        codigos = filtros["codigo_entidad"]
+        codigos = codigos if isinstance(codigos, list) else [codigos]
+        codigos = [normalizar_documento(c) for c in codigos]
+        if not all(codigos):
+            raise ValueError("codigo_entidad debe tener dígitos")
+        limpios["codigo_entidad"] = codigos[0] if len(codigos) == 1 else codigos
+
+    if filtros.get("nombre_entidad_empieza"):
+        inicio = str(filtros["nombre_entidad_empieza"]).strip()
+        if len(inicio) < 5:
+            raise ValueError("nombre_entidad_empieza necesita al menos 5 letras")
+        limpios["nombre_entidad_empieza"] = inicio
+
+    # año único o rango
+    for campo in ("anio", "anio_desde", "anio_hasta"):
+        if filtros.get(campo) is not None:
+            anio = int(filtros[campo])
+            # secop ii desde 2015
+            if not 2015 <= anio <= datetime.now().year:
+                raise ValueError(f"Año fuera de rango: {anio}")
+            limpios[campo] = anio
+    if "anio" in limpios and ("anio_desde" in limpios or "anio_hasta" in limpios):
+        raise ValueError("Usa anio para un solo año o anio_desde / anio_hasta para un rango, no ambos")
+    if limpios.get("anio_desde", 0) > limpios.get("anio_hasta", 9999):
+        raise ValueError("anio_desde no puede ser mayor que anio_hasta")
+
+    if filtros.get("objeto_contiene"):
+        palabras = filtros["objeto_contiene"]
+        palabras = palabras if isinstance(palabras, list) else [palabras]
+        palabras = [str(p).strip() for p in palabras if str(p).strip()]
+        if not palabras or any(len(p) < 3 for p in palabras):
+            raise ValueError("objeto_contiene necesita palabras de al menos 3 letras")
+        limpios["objeto_contiene"] = palabras
+
+    if filtros.get("tipo_persona"):
+        tipo = normalizar_texto(filtros["tipo_persona"]).lower()
+        if tipo not in ("natural", "juridica"):
+            raise ValueError("tipo_persona debe ser 'natural' o 'juridica'")
+        limpios["tipo_persona"] = tipo
+
+    if filtros.get("duracion_min_dias") is not None:
+        dias = int(filtros["duracion_min_dias"])
+        if dias <= 0:
+            raise ValueError("duracion_min_dias debe ser mayor que 0")
+        limpios["duracion_min_dias"] = dias
 
     if filtros.get("modalidades"):
         modalidades = filtros["modalidades"]
@@ -230,19 +282,58 @@ def patron_like(texto):
     return re.sub(r"[AEIOUN]", "_", texto)
 
 
+def variantes_tilde(texto):
+    # sin tilde y una tilde por posición
+    base = quitar_tildes(texto).upper()
+    acentos = {"A": "Á", "E": "É", "I": "Í", "O": "Ó", "U": "Ú", "N": "Ñ"}
+    variantes = [base]
+    for i, letra in enumerate(base):
+        if letra in acentos:
+            variantes.append(base[:i] + acentos[letra] + base[i + 1:])
+    return variantes
+
+
+def _like_alguna(columna, textos, inicio="%", fin="%"):
+    opciones = [f"upper({columna}) like {texto_soql(inicio + v + fin)}" for t in textos for v in variantes_tilde(t)]
+    return "(" + " OR ".join(opciones) + ")"
+
+
 def construir_where(filtros):
     filtros = validar_filtros(filtros)
     # siempre fuera borradores
     condiciones = [f"estado_contrato not in ({', '.join(texto_soql(e) for e in ESTADOS_EXCLUIDOS)})"]
 
     if "codigo_entidad" in filtros:
-        condiciones.append(f"codigo_entidad = {filtros['codigo_entidad']}")
+        codigos = filtros["codigo_entidad"]
+        if isinstance(codigos, list):
+            condiciones.append(f"codigo_entidad in ({', '.join(codigos)})")
+        else:
+            condiciones.append(f"codigo_entidad = {codigos}")
+    if "nombre_entidad_empieza" in filtros:
+        # sin importar tildes
+        condiciones.append(_like_alguna("nombre_entidad", [filtros["nombre_entidad_empieza"]], inicio=""))
     if "nit_entidad" in filtros:
         condiciones.append(f"nit_entidad = {filtros['nit_entidad']}")
     if "documento_proveedor" in filtros:
         condiciones.append(f"documento_proveedor = {texto_soql(filtros['documento_proveedor'])}")
     if "anio" in filtros:
         condiciones.append(f"date_extract_y(fecha_de_firma) = {filtros['anio']}")
+    if "anio_desde" in filtros:
+        condiciones.append(f"date_extract_y(fecha_de_firma) >= {filtros['anio_desde']}")
+    if "anio_hasta" in filtros:
+        condiciones.append(f"date_extract_y(fecha_de_firma) <= {filtros['anio_hasta']}")
+    if "objeto_contiene" in filtros:
+        # alguna palabra, sin tildes
+        condiciones.append(_like_alguna("objeto_del_contrato", filtros["objeto_contiene"]))
+    if filtros.get("tipo_persona") == "juridica":
+        condiciones.append(f"tipodocproveedor in ({', '.join(texto_soql(d) for d in DOCUMENTOS_JURIDICA)})")
+    if filtros.get("tipo_persona") == "natural":
+        excluidos = DOCUMENTOS_JURIDICA + DOCUMENTOS_SIN_TIPO
+        condiciones.append(f"tipodocproveedor not in ({', '.join(texto_soql(d) for d in excluidos)})")
+    if "duracion_min_dias" in filtros:
+        condiciones.append(
+            f"date_diff_d(fecha_de_fin_del_contrato, fecha_de_inicio_del_contrato) >= {filtros['duracion_min_dias']}"
+        )
     if "modalidades" in filtros:
         lista = ", ".join(texto_soql(m) for m in filtros["modalidades"])
         condiciones.append(f"modalidad_de_contratacion in ({lista})")

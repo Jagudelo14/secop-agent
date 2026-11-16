@@ -82,3 +82,46 @@ def test_where_escapa_comillas():
 
 def test_patron_like_ignora_tildes():
     assert schema.patron_like("Bogotá") == "B_G_T_"
+
+
+# ### Capacidades nuevas ###
+def test_rango_de_anios():
+    where = schema.construir_where({"anio_desde": 2020, "anio_hasta": 2024})
+    assert "date_extract_y(fecha_de_firma) >= 2020" in where
+    assert "date_extract_y(fecha_de_firma) <= 2024" in where
+
+
+def test_anio_y_rango_no_se_combinan():
+    with pytest.raises(ValueError):
+        schema.validar_filtros({"anio": 2022, "anio_desde": 2020})
+    with pytest.raises(ValueError):
+        schema.validar_filtros({"anio_desde": 2024, "anio_hasta": 2020})
+
+
+def test_objeto_contiene_con_y_sin_tilde():
+    where = schema.construir_where({"objeto_contiene": ["vía"]})
+    assert "like '%VIA%'" in where and "like '%VÍA%'" in where
+    # no comodines en vocales
+    assert "V__" not in where
+
+
+def test_tipo_persona():
+    assert "tipodocproveedor in ('NIT')" in schema.construir_where({"tipo_persona": "jurídica"})
+    natural = schema.construir_where({"tipo_persona": "natural"})
+    assert "tipodocproveedor not in ('NIT', 'Otro', 'No Definido')" in natural
+    with pytest.raises(ValueError):
+        schema.validar_filtros({"tipo_persona": "empresa"})
+
+
+def test_duracion_minima():
+    where = schema.construir_where({"duracion_min_dias": 184})
+    assert "date_diff_d(fecha_de_fin_del_contrato, fecha_de_inicio_del_contrato) >= 184" in where
+
+
+def test_varias_entidades_y_nombre_que_empieza():
+    where = schema.construir_where({"codigo_entidad": ["700221021", "712170091"]})
+    assert "codigo_entidad in (700221021, 712170091)" in where
+    where = schema.construir_where({"nombre_entidad_empieza": "Distrito Especial"})
+    assert "upper(nombre_entidad) like 'DISTRITO ESPECIAL%'" in where
+    with pytest.raises(ValueError):
+        schema.validar_filtros({"nombre_entidad_empieza": "abc"})
