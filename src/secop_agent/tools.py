@@ -130,7 +130,8 @@ def _dependencias(filas):
             continue
         inicio = nombre.split("-")[0].strip()
         if len(inicio) >= 5:
-            grupos.setdefault(inicio, set()).add(f.get("codigo_entidad"))
+            # mismo inicio sin tildes
+            grupos.setdefault(normalizar_texto(inicio), set()).add(f.get("codigo_entidad"))
     # dos o más comparten inicio
     return [
         {
@@ -194,10 +195,26 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
         columnas.append("max(tipodocproveedor) as tipo_documento")
     columnas += COLUMNAS_METRICAS
 
+    # sin ubicación no es un lugar
+    where_grupos = where
+    sin_ubicacion = None
+    if agrupar_por in ("ciudad", "departamento"):
+        where_grupos = f"{where} AND {grupo['clave']} != 'No Definido'"
+        fila = socrata.consultar({
+            "$select": "count(*) as num_contratos, sum(valor_del_contrato) as total_valor",
+            "$where": f"{where} AND {grupo['clave']} = 'No Definido'",
+        })
+        fila = fila[0] if fila else {}
+        sin_ubicacion = {
+            "num_contratos": int(a_numero(fila.get("num_contratos"))),
+            "total_valor": a_numero(fila.get("total_valor")),
+            "nota": f"Contratos sin {agrupar_por} registrada en SECOP ('No Definido'); no entran al ranking",
+        }
+
     # ranking agrupado en servidor
     filas = socrata.consultar({
         "$select": ", ".join(columnas),
-        "$where": where,
+        "$where": where_grupos,
         "$group": grupo["clave"],
         "$order": f"{METRICAS[metrica]} DESC, clave",
         "$limit": min(int(top), 100),
@@ -249,6 +266,7 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
             "contratistas_distintos": int(a_numero(totales.get("contratistas_distintos"))),
         },
         "grupos": grupos,
+        "sin_ubicacion": sin_ubicacion,
     }
 
 
@@ -351,7 +369,7 @@ ESQUEMA_FILTROS = {
         "anio": {"type": "integer", "description": "Un solo año de la fecha de firma"},
         "anio_desde": {"type": "integer", "description": "Primer año de un rango de fechas de firma (incluido). No combinar con anio."},
         "anio_hasta": {"type": "integer", "description": "Último año de un rango de fechas de firma (incluido). No combinar con anio."},
-        "objeto_contiene": {"type": "array", "items": {"type": "string"}, "description": "Palabras a buscar en el objeto del contrato, sin importar tildes. Basta con que aparezca una."},
+        "objeto_contiene": {"type": "array", "items": {"type": "string"}, "description": "Palabras a buscar en el objeto del contrato, sin importar tildes. Basta con que aparezca una. Como se busca la palabra dentro del texto, usa la forma más corta (singular o raíz) para no perder variantes."},
         "tipo_persona": {"type": "string", "enum": ["natural", "juridica"], "description": "Tipo de contratista: natural (documento personal) o juridica (NIT)."},
         "duracion_min_dias": {"type": "integer", "description": "Duración mínima del contrato en días, calculada entre la fecha de inicio y la de fin."},
         "modalidades": {"type": "array", "items": {"type": "string", "enum": MODALIDADES}, "description": "Contratación directa = ['Contratación directa', 'Contratación Directa (con ofertas)']"},
@@ -399,7 +417,16 @@ HERRAMIENTAS = [
             "type": "object",
             "properties": {
                 "filtros": ESQUEMA_FILTROS,
-                "agrupar_por": {"type": "string", "enum": list(AGRUPACIONES)},
+                "agrupar_por": {
+                    "type": "string",
+                    "enum": list(AGRUPACIONES),
+                    "description": (
+                        "Qué forma cada grupo. proveedor = contratista. entidad = entidad que contrata. "
+                        "modalidad = modalidad de contratación. tipo_de_contrato = tipo de contrato. "
+                        "departamento = departamento de la entidad. ciudad = municipio o ciudad de la entidad. "
+                        "anio = año de firma. sector = sector administrativo de la entidad."
+                    ),
+                },
                 "metrica": {
                     "type": "string",
                     "enum": list(METRICAS),

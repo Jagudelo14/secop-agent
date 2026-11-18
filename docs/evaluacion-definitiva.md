@@ -27,11 +27,12 @@ Esta es la evaluación que se presenta. Usa el set de 50 preguntas escrito por J
 
 ## Protocolo (registrado antes de cualquier corrida)
 
-1. **Línea base:** se corre el agente tal como está al congelar el set (prompt v5, sin cambios), una vez, sobre las 50 preguntas.
-2. **Capacidades:** se implementa **solo** la lista cerrada de la sección siguiente. Se desarrolla y se prueba con pruebas unitarias y preguntas propias, **nunca** corriendo el agente sobre las 50 del set.
-3. **Congelamiento:** se fija la versión final del código y del prompt y se registra el commit.
-4. **Corrida final:** una sola vez sobre las 50 preguntas. Las preguntas que no respondan por saturación de Gemini cuentan como no respondidas; no se repiten para mejorar la cifra.
-5. **Reporte:** se presentan las dos corridas (línea base y final), con todas las métricas, sin excluir preguntas.
+1. **Capacidades:** se implementa **solo** la lista cerrada de la sección siguiente. Se desarrolla y se prueba con pruebas unitarias y preguntas propias, **nunca** corriendo el agente sobre las 50 del set.
+2. **Congelamiento:** se fija la versión final del código y del prompt y se registra el commit.
+3. **Corrida final:** una sola vez sobre las 50 preguntas. Es la única vez que el agente ve este set. Las preguntas que no respondan por saturación o cuota de Gemini cuentan como no respondidas; no se repiten para mejorar la cifra.
+4. **Reporte:** se presenta esa corrida con todas las métricas, sin excluir preguntas.
+
+**Cambio de protocolo (2026-11-17):** el plan inicial incluía una línea base con el agente v5 sobre estas mismas 50 preguntas. El autor decidió que el set se use solo para la medición final. La línea base se canceló cuando había respondido 1 pregunta (P01); esa respuesta se borró sin leerla ni calificarla. La copia `evals/linea_base/` queda en el repositorio pero no se usa.
 
 Después de la corrida final el agente no recibe más cambios. Si aparece un error del agente, se documenta como hallazgo, no se corrige para volver a medir.
 
@@ -39,7 +40,7 @@ Después de la corrida final el agente no recibe más cambios. Si aparece un err
 
 | Tema | Decisión |
 | --- | --- |
-| Enfoque | Línea base primero, después capacidades preregistradas, luego una corrida final |
+| Enfoque | Capacidades preregistradas y luego una sola corrida final. La línea base sobre este set se canceló el 2026-11-17 por decisión del autor |
 | P05 "entidades territoriales" del Tolima | Cuentan todas las entidades ubicadas en Tolima |
 | Preguntas de búsqueda por texto (P35, P37, P38, P40) | Las palabras clave que definen la respuesta correcta las propone el desarrollador y las aprueba el autor antes de congelar las respuestas correctas |
 | Ambiguas (P41–P45) | Acierta si pide aclaración o si separa las entidades aclarando que son varias. Falla si elige una sola en silencio o suma todo como si fuera una entidad |
@@ -82,11 +83,11 @@ Las preguntas de conteo, ranking y filtro se califican automáticamente con `eva
 
 ## Estado del agente
 
-### Línea base (agente v5, sin capacidades nuevas)
+### Línea base (cancelada)
 
 - **Copia congelada:** `evals/linea_base/secop_agent/`, guardada el 2026-11-16 a las 16:04, antes de tocar el código para las capacidades nuevas.
 - **Huella SHA-256** del conjunto de archivos `.py`: `89086f8394611fbb1a13924701248c2bc843c9fd72eb0447f2305d9208ccd6a4`
-- **Cómo se corre** (la copia tiene prioridad sobre `src/` gracias a `PYTHONPATH`):
+- **No se usó:** se canceló antes de responder la segunda pregunta (ver cambio de protocolo). El comando que se iba a usar era:
 
 ```
 PYTHONPATH=evals/linea_base python -m uv run python -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl
@@ -115,9 +116,50 @@ Implementadas el 2026-11-16 sin correr el agente sobre ninguna de las 50 pregunt
 
 **Limitación conocida:** la detección de dependencias solo funciona cuando el nombre las separa con guion. Si una entidad está registrada con un nombre poco reconocible (como la Gobernación del Tolima, registrada como "GOBIERNO DEPARTAMENTAL"), el agente no la encuentra por nombre.
 
+### Verificación de capacidades con el agente completo (2026-11-17)
+
+Las pruebas de la v6 se habían hecho solo a nivel de herramienta. Antes de congelar se verificó el agente completo con Gemini, sin tocar el set definitivo:
+
+1. **Prueba de humo** (pregunta propia sobre el INVIAS: contratos sobre puentes entre 2021 y 2023, año por año). Gemini aceptó las definiciones nuevas y el agente usó el rango de años, la búsqueda en el objeto y la agrupación por año. Hallazgos:
+   - Buscó "puentes" en plural, lo que pierde contratos que dicen "puente". **Corrección:** la descripción de `objeto_contiene` pide usar la forma más corta de la palabra.
+   - **Corrección:** la detección de dependencias compara los nombres sin tildes, porque una misma entidad aparece con y sin tilde.
+2. **Set de verificación propio** (`evals/preguntas_capacidades.jsonl`): 10 preguntas, una o dos por capacidad, con entidades que no están en el set definitivo (Ministerio de Educación, ITM, INVIAS, La Guajira, Putumayo, Barranquilla, ICA). Corrida `20261117-202823`: **10/10**, 0 enlaces inventados de 119. Hallazgos:
+   - **v04** (municipios de La Guajira) acertó apenas en la llamada 8 de 8: el modelo no relacionaba "municipios" con agrupar por ciudad. **Correcciones:**
+     - La descripción de `agrupar_por` explica cada opción.
+     - Una regla general en el prompt dice que los rankings de municipios, ciudades o departamentos se arman por ubicación.
+     - `agregar` saca "No Definido" de los rankings por ciudad o departamento y lo reporta aparte en `sin_ubicacion`. Al repetirla, la pregunta había puesto "No Definido" de primero.
+     - Después de las correcciones, v04 acierta con una sola llamada.
+   - **v10** (ICA): el agente detectó las dependencias y usó `nombre_entidad_empieza`. `buscar_entidad` tardó 242 s por lentitud de datos.gov.co.
+
+Con el cambio de texto, el prompt pasa a **v7**.
+
+**Nota sobre la regla de municipios:** coincide con la definición que el autor aprobó para P22 (agrupar por ciudad). Se agregó porque falló una pregunta del set de verificación propio, no por respuestas del set definitivo, que el agente no ha visto.
+
+### Regresión con la v7 y congelamiento
+
+| Set | Corrida | Resultado | Enlaces inventados | Sin respuesta |
+| --- | --- | --- | --- | --- |
+| Capacidades (10) | `20261117-211801` | 10/10 | 0/105 | 0 |
+| Desarrollo (30) | `20261117-204610` | 28/30, igual que la v5 | 0/260 | 0 |
+
+Los dos fallos de desarrollo son los inestables conocidos:
+
+- **f01:** filtra por ubicación en vez de resolver la entidad.
+- **o01:** toma la Secretaría General como si fuera "la Alcaldía de Bogotá". Ha salido bien en v2, v3 y v5, y mal en 3b y v7, con prompts casi iguales. Es variación del modelo lite sin una causa nueva que corregir.
+
+Se cumplió el criterio de parada:
+
+- 28/30 o más en desarrollo.
+- Dos corridas seguidas de capacidades en 10/10.
+- Cero cifras sin respaldo.
+- Enlaces inventados por debajo del 1%.
+- Ningún tipo de fallo nuevo arreglable.
+
+**El agente v7 queda congelado.** No recibe más cambios antes ni después de la corrida final.
+
 ### Corrida final
 
-Pendiente. Se congela el agente v6 antes de correrla.
+Pendiente, con la cuota diaria completa de Gemini.
 
 ## Respuestas correctas
 

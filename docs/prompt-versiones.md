@@ -165,7 +165,26 @@ Comparación honesta: la v3 sacó 30/30 con ejemplos del set en el prompt, y la 
 
 La v6 agrega las capacidades C1 a C8 (rangos de años, búsqueda en el objeto, agrupar por ciudad y sector, promedio, contratistas distintos, tipo de persona, duración, varias entidades y robustez ante errores de red). Se decidieron leyendo los temas del set definitivo de 50 preguntas, antes de correr el agente sobre él. El detalle, el protocolo y los resultados están en [evaluacion-definitiva.md](evaluacion-definitiva.md).
 
-Antes de los cambios se guardó una copia exacta de la v5 en `evals/linea_base/` para correr la línea base.
+Antes de los cambios se guardó una copia exacta de la v5 en `evals/linea_base/` para correr la línea base. Esa línea base se canceló después por decisión del autor.
+
+## Iteración 7 — v7, verificación con el agente completo
+
+La v6 solo se había probado a nivel de herramienta. Al correr el agente completo sobre un set de verificación propio de 10 preguntas (`evals/preguntas_capacidades.jsonl`) aparecieron tres problemas, que se corrigieron en términos generales:
+
+1. **Plural en la búsqueda por objeto.** El agente buscaba "puentes" y perdía los contratos con "puente". La descripción del filtro ahora pide usar la forma más corta.
+2. **Rankings de municipios.** El modelo los armaba por entidad (alcaldías) en vez de por ubicación, y además ponía "No Definido" como si fuera un municipio. Correcciones:
+   - Se describió cada opción de `agrupar_por`.
+   - Se agregó una regla general de ubicación al prompt.
+   - `agregar` saca "No Definido" de los rankings por ciudad o departamento y lo reporta aparte.
+3. **Dependencias con y sin tilde.** Se agrupan sin tildes.
+
+| Corrida | Prompt | Set | Resultado | Enlaces inventados |
+| --- | --- | --- | --- | --- |
+| `20261117-202823` | v6 | capacidades (10) | 10/10 (v04 acertó apenas en la llamada 8 de 8) | 0/119 |
+| `20261117-211801` | v7 | capacidades (10) | 10/10 | 0/105 |
+| `20261117-204610` | v7 | desarrollo (30) | 28/30 (f01 y o01) | 0/260 |
+
+Con eso se cumplió el criterio de parada y **la v7 quedó congelada** para la evaluación definitiva.
 
 ## Set de prueba
 

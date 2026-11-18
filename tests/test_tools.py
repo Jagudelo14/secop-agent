@@ -97,7 +97,8 @@ def test_agregar_promedio_y_contratistas_distintos(monkeypatch):
     assert r["total_general"]["promedio_valor"] == 100
     assert r["total_general"]["contratistas_distintos"] == 3
     assert r["grupos"][0]["contratistas_distintos"] == 3
-    assert consultas[0]["$order"].startswith("contratistas_distintos DESC")
+    agrupada = [c for c in consultas if "$group" in c][0]
+    assert agrupada["$order"].startswith("contratistas_distintos DESC")
 
 
 def test_buscar_entidad_marca_dependencias(monkeypatch):
@@ -111,3 +112,23 @@ def test_buscar_entidad_marca_dependencias(monkeypatch):
 
     assert r["dependencias"][0]["inicio_nombre"] == "ENTIDAD EJEMPLO"
     assert r["dependencias"][0]["num_entidades"] == 2
+
+
+def test_ranking_por_ciudad_saca_no_definido(monkeypatch):
+    consultas = []
+
+    def falso_consultar(params):
+        consultas.append(params)
+        if "ciudad = 'No Definido'" in params.get("$where", ""):
+            return [{"num_contratos": "7", "total_valor": "900"}]
+        if "$group" in params:
+            return [{"clave": "Ciudad A", "num_contratos": "2", "total_valor": "50"}]
+        return []
+
+    monkeypatch.setattr(socrata, "consultar", falso_consultar)
+    r = tools.agregar({}, "ciudad", metrica="suma_valor", top=5, incluir_enlaces=False)
+
+    agrupada = [c for c in consultas if "$group" in c][0]
+    assert "ciudad != 'No Definido'" in agrupada["$where"]
+    assert r["sin_ubicacion"]["num_contratos"] == 7
+    assert [g["clave"] for g in r["grupos"]] == ["Ciudad A"]
