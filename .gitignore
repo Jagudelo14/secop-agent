@@ -10,7 +10,9 @@ __pycache__/
 *.pyc
 .pytest_cache/
 .cache/
-evals/resultados/
+evals/resultados/*
+!evals/resultados/20261118-085949*
+!evals/resultados/definitiva*.log
 docs/muestra.json
 .env.*
 !.env.example

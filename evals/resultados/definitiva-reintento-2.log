@@ -1,0 +1,27 @@
+Corrida: evals\resultados\20261118-085949.jsonl
+P31 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P34 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+
+P01 OK  1 cifra(s) correctas
+P02 OK  3 cifra(s) correctas
+P03 OK  2 cifra(s) correctas
+P04 OK  2 cifra(s) correctas
+P05 OK  1 cifra(s) correctas
+P06 OK  1 cifra(s) correctas
+P07 OK  1 cifra(s) correctas
+P08 MAL no aparece 11,155
+P09 OK  2 cifra(s) correctas
+P10 OK  6 cifra(s) correctas
+P11 OK  3 cifra(s) correctas
+P12 OK  1 cifra(s) correctas
+P13 OK  1 cifra(s) correctas
+P14 MAL no aparece 2,268
+P15 OK  1 cifra(s) correctas
+P16 OK  top 10 en orden
+P17 OK  top 5 en orden
+P18 MAL faltan: ['Chocó', 'Distrito Capital de Bogotá', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Bolívar', 'Caldas', 'Santander', 'Cundinamarca', 'Boyacá']
+P19 OK  top 10 en orden
+P20 MAL faltan: ['ESE HOSPITAL SALAZAR DE VILLETA', 'HOSPITAL UNIVERSITARIO LA SAMARITANA', 'E.S.E HOSPITAL PEDRO LEON ALVAREZ DIAZ', 'E.S.E. HOSPITAL EL SALVADOR DE UBATE', 'ESE HOSPITAL SAN RAFAEL DE FUSAGASUGÁ', 'EMPRESA SOCIAL DEL ESTADO HOSPITAL SAN R', 'EMPRESA SOCIAL DEL ESTADO MARCO FELIPE A', 'ESE HOSPITAL SAN JOSE DE GUADUAS', 'E.S.E REGIÓN DE SALUD CENTRO ORIENTE ALM', 'HOSPITAL SAN VICENTE DE PAUL DE FOMEQUE']
+P21 OK  top 10 en orden
+P22 OK  top 10 en orden
+P23 MAL faltan: ['Corporación de Eventos, Ferias y Espectá', 'Fondo Mixto de Cultura y las Artes del V']

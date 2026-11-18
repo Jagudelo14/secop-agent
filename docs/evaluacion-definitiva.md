@@ -29,8 +29,12 @@ Esta es la evaluación que se presenta. Usa el set de 50 preguntas escrito por J
 
 1. **Capacidades:** se implementa **solo** la lista cerrada de la sección siguiente. Se desarrolla y se prueba con pruebas unitarias y preguntas propias, **nunca** corriendo el agente sobre las 50 del set.
 2. **Congelamiento:** se fija la versión final del código y del prompt y se registra el commit.
-3. **Corrida final:** una sola vez sobre las 50 preguntas. Es la única vez que el agente ve este set. Las preguntas que no respondan por saturación o cuota de Gemini cuentan como no respondidas; no se repiten para mejorar la cifra.
+3. **Corrida final:** una sola vez sobre las 50 preguntas. Es la única vez que el agente ve este set. Las preguntas que no respondan por saturación o cuota de Gemini se repiten al final (ver cambio de protocolo del 2026-11-18).
 4. **Reporte:** se presenta esa corrida con todas las métricas, sin excluir preguntas.
+
+**Cambio de protocolo (2026-11-18, durante la corrida final y antes de calificar):** por decisión del autor, las preguntas que queden sin respuesta porque Gemini no respondió (saturación o cuota) **sí se repiten** al final de la corrida, con `--continuar`, hasta tener respuesta. Solo se repiten las que no tienen respuesta. Las que ya respondieron no se repiten, sean correctas o no. El reporte dice cuáles se repitieron y cuántos intentos necesitaron.
+
+**Ampliación (2026-11-18, por decisión del autor):** la misma regla aplica cuando la caída es de datos.gov.co. En P18, P41 y P44 el agente respondió solo que el servidor de SECOP II no respondía, sin dar datos. Se repiten igual que las de Gemini, porque es una falla de infraestructura y no del agente. Esas respuestas se identificaron con una búsqueda automática de frases de error ("no responde", "timed out", "intenta de nuevo"), sin calificar el resto.
 
 **Cambio de protocolo (2026-11-17):** el plan inicial incluía una línea base con el agente v5 sobre estas mismas 50 preguntas. El autor decidió que el set se use solo para la medición final. La línea base se canceló cuando había respondido 1 pregunta (P01); esa respuesta se borró sin leerla ni calificarla. La copia `evals/linea_base/` queda en el repositorio pero no se usa.
 
@@ -159,7 +163,34 @@ Se cumplió el criterio de parada:
 
 ### Corrida final
 
-Pendiente, con la cuota diaria completa de Gemini.
+**Estado al cierre del 2026-11-18 (en curso, sin calificar):**
+
+- **Corrida:** `evals/resultados/20261118-085949.jsonl`, con el agente v7 congelado (commit `v0.5.1`).
+- **Pasada inicial:** 50 preguntas. Copia en `20261118-085949-pasada1.jsonl`.
+- **Sin respuesta de Gemini:** P12, P21, P24, P28, P31, P34, P37 y P50.
+  - Reintento 1: respondieron P12, P21, P24, P28, P37 y P50.
+  - Reintentos 2 y 3: respondieron P31 y P34 en el tercero.
+- **Caída de datos.gov.co:** en P18, P41 y P44 el agente respondió solo que el servidor no respondía. Copia del estado previo en `20261118-085949-antes-reintento-infra.jsonl`.
+  - Al repetirlas, P18 y P41 respondieron.
+  - P44 se detuvo sin terminar al cerrar la sesión y **falta repetirla**.
+- **Archivos intermedios:** `-verificado.jsonl`, `-metricas.md` y `-respuestas.md` son de una verificación anterior a los reintentos y no son el resultado final.
+
+**Pendiente:**
+
+1. Repetir P44:
+
+```
+.venv/Scripts/python.exe -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl --continuar evals/resultados/20261118-085949.jsonl --sin-verificar
+```
+
+2. Verificar las 50 una sola vez:
+
+```
+.venv/Scripts/python.exe -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl --verificar evals/resultados/20261118-085949.jsonl
+```
+
+3. Calificar a mano P41 a P50 en `20261118-085949-manual.json`, con la razón de cada una, y volver a verificar.
+4. Escribir las estadísticas finales en este documento.
 
 ## Respuestas correctas
 

@@ -1,0 +1,191 @@
+Corrida: C:\Users\camilo\Desktop\Proyecto Agente IA\secop-agent\evals\resultados\20261118-085949.jsonl
+P01 gemini-3.5-flash-lite · 11,194/134 tokens · 39.79s · 2 herr.
+P02 gemini-3.5-flash-lite · 12,480/581 tokens · 120.39s · 2 herr.
+P03 gemini-3.5-flash-lite · 19,065/288 tokens · 342.54s · 3 herr.
+P04 gemini-3.5-flash-lite · 11,520/283 tokens · 265.3s · 2 herr.
+P05 gemini-3.1-flash-lite · 11,598/586 tokens · 260.96s · 1 herr.
+P06 gemini-3.1-flash-lite · 14,952/125 tokens · 139.73s · 2 herr.
+P07 gemini-3.5-flash-lite · 13,341/836 tokens · 65.44s · 2 herr.
+P08 gemini-3.5-flash-lite · 23,739/200 tokens · 106.81s · 3 herr.
+P09 gemini-3.5-flash-lite · 24,172/1,199 tokens · 128.0s · 3 herr.
+P10 gemini-3.5-flash-lite · 13,725/972 tokens · 108.53s · 2 herr.
+P11 gemini-3.5-flash-lite · 17,902/567 tokens · 102.0s · 3 herr.
+P12 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P13 gemini-3.5-flash-lite · 11,656/452 tokens · 53.15s · 2 herr.
+P14 gemini-3.1-flash-lite · 34,798/790 tokens · 285.7s · 3 herr.
+P15 gemini-3.5-flash-lite · 49,205/485 tokens · 52.71s · 4 herr.
+P16 gemini-3.5-flash-lite · 24,509/1,445 tokens · 76.44s · 3 herr.
+P17 gemini-3.5-flash-lite · 22,832/772 tokens · 131.49s · 3 herr.
+P18 gemini-3.5-flash-lite · 10,986/138 tokens · 579.0s · 2 herr.
+P19 gemini-3.5-flash-lite · 11,575/1,473 tokens · 93.97s · 1 herr.
+P20 gemini-3.5-flash-lite · 20,027/1,328 tokens · 45.93s · 2 herr.
+P21 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P22 gemini-3.5-flash-lite · 11,462/1,196 tokens · 72.52s · 1 herr.
+P23 gemini-3.5-flash-lite · 28,844/1,423 tokens · 27.94s · 3 herr.
+P24 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.1-flash-lite): 503 UNAVAILABLE. {'er
+P25 gemini-3.1-flash-lite · 11,572/1,371 tokens · 29.14s · 1 herr.
+P26 gemini-3.5-flash-lite · 11,511/1,355 tokens · 33.84s · 1 herr.
+P27 gemini-3.5-flash-lite · 11,384/1,218 tokens · 196.36s · 1 herr.
+P28 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P29 gemini-3.5-flash-lite · 9,460/746 tokens · 34.16s · 1 herr.
+P30 gemini-3.5-flash-lite · 11,085/1,322 tokens · 198.31s · 1 herr.
+P31 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P32 gemini-3.1-flash-lite · 32,080/6,728 tokens · 172.18s · 2 herr.
+P33 gemini-3.5-flash-lite · 34,523/4,958 tokens · 48.11s · 3 herr.
+P34 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P35 gemini-3.1-flash-lite · 38,304/5,656 tokens · 125.99s · 3 herr.
+P36 gemini-3.1-flash-lite · 74,625/1,291 tokens · 72.63s · 4 herr.
+P37 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P38 gemini-3.5-flash-lite · 38,397/869 tokens · 262.13s · 3 herr.
+P39 gemini-3.1-flash-lite · 20,008/2,816 tokens · 51.61s · 2 herr.
+P40 gemini-3.5-flash-lite · 46,923/594 tokens · 85.19s · 4 herr.
+P41 gemini-3.5-flash-lite · 10,873/90 tokens · 534.1s · 2 herr.
+P42 gemini-3.5-flash-lite · 69,365/574 tokens · 334.1s · 8 herr.
+P43 gemini-3.5-flash-lite · 46,163/499 tokens · 196.85s · 8 herr.
+P44 gemini-3.5-flash-lite · 14,779/219 tokens · 577.6s · 3 herr.
+P45 gemini-3.5-flash-lite · 12,493/834 tokens · 86.97s · 2 herr.
+P46 gemini-3.5-flash-lite · 22,005/1,665 tokens · 43.07s · 2 herr.
+P47 gemini-3.1-flash-lite · 56,301/539 tokens · 83.15s · 3 herr.
+P48 gemini-3.5-flash-lite · 15,621/95 tokens · 70.53s · 2 herr.
+P49 gemini-3.5-flash-lite · 86,682/585 tokens · 55.16s · 3 herr.
+P50 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+
+P01 OK  1 cifra(s) correctas
+P02 OK  3 cifra(s) correctas
+P03 OK  2 cifra(s) correctas
+P04 OK  2 cifra(s) correctas
+P05 OK  1 cifra(s) correctas
+P06 OK  1 cifra(s) correctas
+P07 OK  1 cifra(s) correctas
+P08 MAL no aparece 11,155
+P09 OK  2 cifra(s) correctas
+P10 OK  6 cifra(s) correctas
+P11 OK  3 cifra(s) correctas
+P13 OK  1 cifra(s) correctas
+P14 MAL no aparece 2,268
+P15 OK  1 cifra(s) correctas
+P16 OK  top 10 en orden
+P17 OK  top 5 en orden
+P18 MAL faltan: ['Chocó', 'Distrito Capital de Bogotá', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Bolívar', 'Caldas', 'Santander', 'Cundinamarca', 'Boyacá']
+P19 OK  top 10 en orden
+P20 MAL faltan: ['ESE HOSPITAL SALAZAR DE VILLETA', 'HOSPITAL UNIVERSITARIO LA SAMARITANA', 'E.S.E HOSPITAL PEDRO LEON ALVAREZ DIAZ', 'E.S.E. HOSPITAL EL SALVADOR DE UBATE', 'ESE HOSPITAL SAN RAFAEL DE FUSAGASUGÁ', 'EMPRESA SOCIAL DEL ESTADO HOSPITAL SAN R', 'EMPRESA SOCIAL DEL ESTADO MARCO FELIPE A', 'ESE HOSPITAL SAN JOSE DE GUADUAS', 'E.S.E REGIÓN DE SALUD CENTRO ORIENTE ALM', 'HOSPITAL SAN VICENTE DE PAUL DE FOMEQUE']
+P22 OK  top 10 en orden
+P23 MAL faltan: ['Corporación de Eventos, Ferias y Espectá', 'Fondo Mixto de Cultura y las Artes del V']
+P25 OK  top 5 en orden
+P26 OK  top 10 en orden
+P27 OK  top 5 en orden
+P29 OK  top 5 en orden
+P30 OK  top 10 en orden
+P32 MAL total no aparece, sobran 0, listados 49
+P33 MAL faltan 0, sobran 4
+P35 MAL lista 50 de tope 50, sobran 11
+P36 OK  total 62 y 10 ids válidos
+P38 MAL faltan 45, sobran 0
+P39 OK  23 ids iguales
+P40 OK  2 ids iguales
+P41 MAL no pidió aclaración ni separó (revisar a mano)
+P42 MAL no pidió aclaración ni separó (revisar a mano)
+P43 MAL no pidió aclaración ni separó (revisar a mano)
+P44 MAL no pidió aclaración ni separó (revisar a mano)
+P45 MAL no pidió aclaración ni separó (revisar a mano)
+P46 MAL dio cifras o no declinó
+P47 OK  pidió aclaración o declinó
+P48 OK  pidió aclaración o declinó
+P49 MAL dio cifras o no declinó
+## Métricas de evaluación — 2026-11-18 11:05
+
+**Acierto: 26/50 (52.0%)** · meta del SPEC: 24/30 (80%)
+
+Prompt: v7
+
+| Métrica | Valor |
+| --- | --- |
+| Aciertos | 26/50 (52.0%) |
+| Fallos (respuesta incorrecta) | 16/50 (32.0%) |
+| Errores del agente (no respondió) | 8/50 (16.0%) |
+| Preguntas con algún error de herramienta | 3/50 (6.0%) |
+| Llamadas a herramientas con error | 7/108 (6.5%) |
+| Preguntas que llegaron al límite de 8 llamadas | 2/50 (4.0%) |
+| Respuestas con datos que incluyen enlace | 28/33 (84.8%) |
+| Enlaces inventados (no vienen de ninguna herramienta) | 0/334 (0.0%) |
+| Herramientas por pregunta (promedio) | 2.2 |
+| Latencia promedio / mediana / p95 (s) | 152.1 / 94.0 / 534.1 |
+| Modelos que respondieron | gemini-3.5-flash-lite: 33, gemini-3.1-flash-lite: 9, sin respuesta: 8 |
+
+### Por tipo de pregunta
+
+| Tipo | Acierto | Tokens entrada prom. | Tokens salida prom. | Latencia prom. (s) | Herramientas prom. |
+| --- | --- | --- | --- | --- | --- |
+| conteo_suma | 12/15 (80.0%) | 17,956 | 500 | 138.1 | 2.3 |
+| ranking | 9/15 (60.0%) | 12,350 | 919 | 101.3 | 1.3 |
+| filtro | 3/10 (30.0%) | 28,486 | 2,291 | 81.8 | 2.1 |
+| ambigua | 0/5 (0.0%) | 30,735 | 443 | 345.9 | 4.6 |
+| fuera_alcance | 2/5 (40.0%) | 36,122 | 577 | 50.4 | 2.0 |
+| **Total** | 26/50 (52.0%) | 21,475 | 986 | 127.8 | 2.2 |
+
+### Consumo y costo estimado
+
+**Tokens totales:** 1,073,736 de entrada · 49,297 de salida
+
+Costo estimado con los mismos tokens, sin caché (aproximado, cada proveedor tokeniza distinto):
+
+| Modelo | Costo total (USD) | Por pregunta (USD) | 1.000 preguntas (USD) |
+| --- | --- | --- | --- |
+| claude-sonnet-5-5 | 2.6404 | 0.05281 | 52.81 |
+| claude-haiku-5-5 | 0.1320 | 0.00264 | 2.64 |
+
+### Detalle
+
+| Id | Tipo | Resultado | Detalle | Tokens entrada | Tokens salida | Latencia (s) | Herramientas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| P01 | conteo_suma | acierto | 1 cifra(s) correctas | 11,194 | 134 | 39.79 | 2 |
+| P02 | conteo_suma | acierto | 3 cifra(s) correctas | 12,480 | 581 | 120.39 | 2 |
+| P03 | conteo_suma | acierto | 2 cifra(s) correctas | 19,065 | 288 | 342.54 | 3 |
+| P04 | conteo_suma | acierto | 2 cifra(s) correctas | 11,520 | 283 | 265.3 | 2 |
+| P05 | conteo_suma | acierto | 1 cifra(s) correctas | 11,598 | 586 | 260.96 | 1 |
+| P06 | conteo_suma | acierto | 1 cifra(s) correctas | 14,952 | 125 | 139.73 | 2 |
+| P07 | conteo_suma | acierto | 1 cifra(s) correctas | 13,341 | 836 | 65.44 | 2 |
+| P08 | conteo_suma | fallo | no aparece 11,155 | 23,739 | 200 | 106.81 | 3 |
+| P09 | conteo_suma | acierto | 2 cifra(s) correctas | 24,172 | 1,199 | 128.0 | 3 |
+| P10 | conteo_suma | acierto | 6 cifra(s) correctas | 13,725 | 972 | 108.53 | 2 |
+| P11 | conteo_suma | acierto | 3 cifra(s) correctas | 17,902 | 567 | 102.0 | 3 |
+| P12 | conteo_suma | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+| P13 | conteo_suma | acierto | 1 cifra(s) correctas | 11,656 | 452 | 53.15 | 2 |
+| P14 | conteo_suma | fallo | no aparece 2,268 | 34,798 | 790 | 285.7 | 3 |
+| P15 | conteo_suma | acierto | 1 cifra(s) correctas | 49,205 | 485 | 52.71 | 4 |
+| P16 | ranking | acierto | top 10 en orden | 24,509 | 1,445 | 76.44 | 3 |
+| P17 | ranking | acierto | top 5 en orden | 22,832 | 772 | 131.49 | 3 |
+| P18 | ranking | fallo | faltan: ['Chocó', 'Distrito Capital de Bogotá', 'Antioquia', 'Valle del Cauca', 'Atlántico', 'Bolívar', 'Caldas', 'Santander', 'Cundinamarca', 'Boyacá'] | 10,986 | 138 | 579.0 | 2 |
+| P19 | ranking | acierto | top 10 en orden | 11,575 | 1,473 | 93.97 | 1 |
+| P20 | ranking | fallo | faltan: ['ESE HOSPITAL SALAZAR DE VILLETA', 'HOSPITAL UNIVERSITARIO LA SAMARITANA', 'E.S.E HOSPITAL PEDRO LEON ALVAREZ DIAZ', 'E.S.E. HOSPITAL EL SALVADOR DE UBATE', 'ESE HOSPITAL SAN RAFAEL DE FUSAGASUGÁ', 'EMPRESA SOCIAL DEL ESTADO HOSPITAL SAN R', 'EMPRESA SOCIAL DEL ESTADO MARCO FELIPE A', 'ESE HOSPITAL SAN JOSE DE GUADUAS', 'E.S.E REGIÓN DE SALUD CENTRO ORIENTE ALM', 'HOSPITAL SAN VICENTE DE PAUL DE FOMEQUE'] | 20,027 | 1,328 | 45.93 | 2 |
+| P21 | ranking | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+| P22 | ranking | acierto | top 10 en orden | 11,462 | 1,196 | 72.52 | 1 |
+| P23 | ranking | fallo | faltan: ['Corporación de Eventos, Ferias y Espectá', 'Fondo Mixto de Cultura y las Artes del V'] | 28,844 | 1,423 | 27.94 | 3 |
+| P24 | ranking | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.1-flash-lite): 503 UNAVAILABLE. {'er | 0 | 0 | 0 | 0 |
+| P25 | ranking | acierto | top 5 en orden | 11,572 | 1,371 | 29.14 | 1 |
+| P26 | ranking | acierto | top 10 en orden | 11,511 | 1,355 | 33.84 | 1 |
+| P27 | ranking | acierto | top 5 en orden | 11,384 | 1,218 | 196.36 | 1 |
+| P28 | ranking | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+| P29 | ranking | acierto | top 5 en orden | 9,460 | 746 | 34.16 | 1 |
+| P30 | ranking | acierto | top 10 en orden | 11,085 | 1,322 | 198.31 | 1 |
+| P31 | filtro | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+| P32 | filtro | fallo | total no aparece, sobran 0, listados 49 | 32,080 | 6,728 | 172.18 | 2 |
+| P33 | filtro | fallo | faltan 0, sobran 4 | 34,523 | 4,958 | 48.11 | 3 |
+| P34 | filtro | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+| P35 | filtro | fallo | lista 50 de tope 50, sobran 11 | 38,304 | 5,656 | 125.99 | 3 |
+| P36 | filtro | acierto | total 62 y 10 ids válidos | 74,625 | 1,291 | 72.63 | 4 |
+| P37 | filtro | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+| P38 | filtro | fallo | faltan 45, sobran 0 | 38,397 | 869 | 262.13 | 3 |
+| P39 | filtro | acierto | 23 ids iguales | 20,008 | 2,816 | 51.61 | 2 |
+| P40 | filtro | acierto | 2 ids iguales | 46,923 | 594 | 85.19 | 4 |
+| P41 | ambigua | fallo | no pidió aclaración ni separó (revisar a mano) | 10,873 | 90 | 534.1 | 2 |
+| P42 | ambigua | fallo | no pidió aclaración ni separó (revisar a mano) | 69,365 | 574 | 334.1 | 8 |
+| P43 | ambigua | fallo | no pidió aclaración ni separó (revisar a mano) | 46,163 | 499 | 196.85 | 8 |
+| P44 | ambigua | fallo | no pidió aclaración ni separó (revisar a mano) | 14,779 | 219 | 577.6 | 3 |
+| P45 | ambigua | fallo | no pidió aclaración ni separó (revisar a mano) | 12,493 | 834 | 86.97 | 2 |
+| P46 | fuera_alcance | fallo | dio cifras o no declinó | 22,005 | 1,665 | 43.07 | 2 |
+| P47 | fuera_alcance | acierto | pidió aclaración o declinó | 56,301 | 539 | 83.15 | 3 |
+| P48 | fuera_alcance | acierto | pidió aclaración o declinó | 15,621 | 95 | 70.53 | 2 |
+| P49 | fuera_alcance | fallo | dio cifras o no declinó | 86,682 | 585 | 55.16 | 3 |
+| P50 | fuera_alcance | error | error del agente: Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite) | 0 | 0 | 0 | 0 |
+
