@@ -13,6 +13,10 @@ Un agente en Python que responde preguntas en lenguaje natural sobre contratos p
 > *¿Qué contratistas recibieron más dinero por contratación directa de la Secretaría General de la Alcaldía Mayor de Bogotá en 2025?*
 > → tabla con el top, total en pesos, número de contratos y enlace a SECOP de cada uno.
 
+![Demo: pregunta en la app, tabla con el top 10 y el contrato abierto en SECOP](docs/demo.gif)
+
+*Demo en línea, en tiempo real y sin cortes: la respuesta tardó 4,7 s y el enlace abre el contrato en SECOP. Según la consulta, una respuesta puede tardar de unos segundos a más de un minuto, sobre todo por datos.gov.co.*
+
 Qué muestra este repo:
 
 1. **Un agente con herramientas sobre una API real con datos sucios.** El bucle de *tool use* está escrito a mano con el SDK `anthropic`, sin LangChain ([agent.py](src/secop_agent/agent.py)).

@@ -22,3 +22,4 @@ docs/muestra.json
 .env.*
 !.env.example
 .streamlit/secrets.toml
+docs/*.mp4
