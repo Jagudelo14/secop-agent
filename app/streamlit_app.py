@@ -5,8 +5,21 @@
 # Descripción: Demo web del agente SECOP II con límite de preguntas por sesión
 
 import os
+import sys
+from pathlib import Path
 
 import streamlit as st
+
+# paquete desde src, aunque la nube no lo instale
+sys.path.insert(0, str(Path(__file__).resolve().parents[1] / "src"))
+
+# secrets de Streamlit Cloud como variables de entorno
+try:
+    for clave, valor in st.secrets.items():
+        if isinstance(valor, (str, int, float)):
+            os.environ.setdefault(clave, str(valor))
+except Exception:  # en local no hay secrets.toml
+    pass
 
 # cédulas ocultas en la demo
 os.environ["SECOP_OCULTAR_DOCUMENTOS"] = "1"

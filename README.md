@@ -156,7 +156,7 @@ En los dos casos el bucle está escrito a mano y el máximo es de 8 llamadas a h
 
 ## Demo pública
 
-La demo de Streamlit usa el proveedor configurado (Gemini en la cuota gratuita, el mismo de la evaluación) con un límite de 5 preguntas por sesión, o Claude Sonnet sin límite si el visitante pega su propia llave de Anthropic. Oculta la cédula de las personas naturales. Para Streamlit Community Cloud se usa `requirements.txt` y en los *secrets* van `PROVEEDOR`, `GEMINI_API_KEY` y `MODELGEMINI` (o `ANTHROPIC_API_KEY` si la demo usa Claude). Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
+La demo de Streamlit usa el proveedor configurado (Gemini en la cuota gratuita, el mismo de la evaluación) con un límite de 5 preguntas por sesión, o Claude Sonnet sin límite si el visitante pega su propia llave de Anthropic. Oculta la cédula de las personas naturales. Para Streamlit Community Cloud, los *secrets* van como en [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example): `PROVEEDOR`, `GEMINI_API_KEY`, `MODELGEMINI` y `GEMINI_RESPALDO` (o `ANTHROPIC_API_KEY` si la demo usa Claude). La app los pasa a variables de entorno al arrancar. Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
 
 ## Estructura
 

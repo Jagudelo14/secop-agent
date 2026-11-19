@@ -21,3 +21,4 @@ evals/resultados/*
 docs/muestra.json
 .env.*
 !.env.example
+.streamlit/secrets.toml
