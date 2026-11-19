@@ -2,7 +2,7 @@
   ### Archivo: README.md ###
   Autor: Juan Camilo Agudelo (Jagudelo14)
   Correo: camiloagu1401@gmail.com
-  Fecha: 2026-11-16
+  Fecha: 2026-11-16 (actualizado 2026-11-19)
   Descripción: Presentación, instalación y métricas del agente SECOP II
 -->
 
@@ -17,7 +17,7 @@ Qué muestra este repo:
 
 1. **Un agente con herramientas sobre una API real con datos sucios.** El bucle de *tool use* está escrito a mano con el SDK `anthropic`, sin LangChain ([agent.py](src/secop_agent/agent.py)).
 2. **Un servidor MCP propio** que expone las mismas herramientas ([mcp_server.py](src/secop_agent/mcp_server.py)).
-3. **Calidad medida** con un set de 30 preguntas cuyas respuestas correctas se recalculan en vivo ([evals/](evals/)).
+3. **Calidad medida** con un set de desarrollo de 30 preguntas y una evaluación final de 50 que el agente vio una sola vez, con respuestas correctas recalculadas en vivo ([evals/](evals/), [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md)). **Resultado final: 37/50 (74%), 0 enlaces inventados de 453.**
 4. **Se corre en cinco minutos.**
 
 ## Arranque en cinco minutos
@@ -26,7 +26,7 @@ Qué muestra este repo:
 pip install uv
 git clone <repo> && cd secop-agent
 uv sync --extra demo
-cp .env.example .env        # pon tu ANTHROPIC_API_KEY (y si quieres SOCRATA_APP_TOKEN)
+cp .env.example .env        # gratis: PROVEEDOR=gemini y GEMINI_API_KEY; o PROVEEDOR=anthropic y ANTHROPIC_API_KEY
 
 uv run python -m secop_agent "¿Cuántos contratos firmó la Gobernación del Cauca en 2025?" --traza
 uv run streamlit run app/streamlit_app.py
@@ -50,11 +50,13 @@ Claude solo decide qué consultar y redacta la respuesta. Los montos, rankings y
 
 | Herramienta | Qué hace |
 | --- | --- |
-| `buscar_entidad(nombre)` | Candidatas con `codigo_entidad` y NIT, sin importar tildes |
+| `buscar_entidad(nombre)` | Candidatas con `codigo_entidad` y NIT, sin importar tildes; avisa cuando son dependencias de una misma entidad |
 | `consultar_contratos(filtros)` | Lista contratos (máximo 5.000) con el conteo y la suma reales |
-| `agregar(filtros, agrupar_por, metrica)` | Rankings y totales agrupados en el servidor con `$group` |
+| `agregar(filtros, agrupar_por, metrica)` | Rankings y totales agrupados en el servidor con `$group`, por contratista, entidad, ciudad, departamento, sector, año, modalidad o tipo |
 | `detectar_alertas(codigo_entidad, anio)` | Las 4 señales con los contratos que las generan |
 | `detalle_contrato(id_contrato)` | Un contrato con su enlace a SECOP |
+
+Los filtros son los mismos en todas: entidad (una, varias o por inicio del nombre), año o rango de años, palabras en el objeto, tipo de contratista (natural o jurídica), duración mínima, modalidad, tipo de contrato, lugar y rango de valor.
 
 ## Lo que salió del esquema real (fase 0)
 
@@ -80,27 +82,45 @@ Cuatro reglas deterministas en pandas ([alerts.py](src/secop_agent/alerts.py)). 
 
 ## Evaluación
 
-30 preguntas en [evals/preguntas.jsonl](evals/preguntas.jsonl), cada una con su consulta SoQL escrita a mano. Las respuestas correctas se recalculan en cada corrida porque SECOP cambia todos los días.
+Hay dos sets, y no cumplen el mismo papel:
 
-| Tipo | Cantidad | Cómo se califica |
-| --- | --- | --- |
-| Conteo o suma | 10 | Cifra exacta o diferencia menor al 1 % |
-| Ranking | 8 | Los 5 primeros coinciden en orden |
-| Filtro con varias condiciones | 8 | Mismo conjunto de `id_contrato` |
-| Fuera de alcance o ambigua | 4 | Pide aclaración o declina, sin inventar cifras |
+- **Desarrollo (30 preguntas)**, en [evals/preguntas.jsonl](evals/preguntas.jsonl): sirvió para mejorar el prompt de v1 a v7. Último resultado: **28/30**. Como se ajustó el agente mirando estas respuestas, el número es optimista. La historia está en [docs/prompt-versiones.md](docs/prompt-versiones.md).
+- **Definitivo (50 preguntas)**, en [evals/preguntas_definitivas.jsonl](evals/preguntas_definitivas.jsonl): escrito por otra persona y congelado con su huella SHA-256 antes de que el agente lo viera. El agente v7 se congeló y respondió una sola vez. Las preguntas que no tuvieron respuesta por caídas de Gemini o de datos.gov.co se repitieron, y se dice cuáles. El protocolo completo y cada decisión están en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md).
+
+Las respuestas correctas son consultas SoQL escritas a mano y se recalculan al calificar, porque SECOP cambia todos los días. Conteo, ranking y filtro se califican automáticamente. Las ambiguas y las fuera de alcance se califican a mano, con la razón escrita en [evals/resultados/20261118-085949-manual.json](evals/resultados/20261118-085949-manual.json).
+
+### Resultado final (corrida `20261118-085949`, Gemini 3.5 Flash-Lite)
+
+| Tipo | Acierto |
+| --- | --- |
+| Conteo o suma | 13/15 (87%) |
+| Ranking | 12/15 (80%) |
+| Filtro | 3/10 (30%) |
+| Ambigua | 4/5 (80%) |
+| Fuera de alcance | 5/5 (100%) |
+| **Total** | **37/50 (74%)** |
+
+| Métrica | Valor |
+| --- | --- |
+| Enlaces inventados (no vienen de ninguna herramienta) | 0/453 |
+| Preguntas sin respuesta | 0/50 |
+| Herramientas por pregunta | 2,7 en promedio |
+| Latencia | 135 s promedio, 87 s mediana, 343 s p95 (la domina datos.gov.co) |
+| Tokens por pregunta | 33.515 de entrada y 1.296 de salida en promedio |
+| Costo | USD 0 con la cuota gratuita de Gemini. Con los mismos tokens: USD 0,004 por pregunta en Claude Haiku 5.5 y USD 0,08 en Claude Sonnet 5.5 |
+
+No se llegó a la meta del SPEC (80%). La causa más frecuente de los 13 fallos es la resolución de entidades: SECOP registra una misma gobernación o alcaldía con nombres distintos (otro prefijo, doble espacio) y el filtro por inicio de nombre deja dependencias por fuera. Le siguen los filtros por texto, en los que el agente elige palabras clave distintas a las que definen la respuesta correcta, y dos errores por tomar "superior a" como "mayor o igual". Cuando falla, falla en cómo arma la consulta, no en inventar: no hay enlaces inventados y declinó bien las 5 preguntas fuera de alcance. El análisis de los 13 fallos está en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md#errores-13).
 
 ```bash
-uv run python evals/run.py --validar          # revisa las 30 consultas, sin gastar LLM
-uv run python evals/run.py --limite 5         # fase 3: las 5 primeras
-uv run python evals/run.py                    # set completo, reporte en evals/resultados/ultimo.md
-uv run python evals/run.py --modelo claude-haiku-5-5
+uv run python evals/run.py --validar                                   # revisa las consultas, sin gastar LLM
+uv run python evals/run.py                                             # set de desarrollo
+uv run python evals/run.py --preguntas evals/preguntas_definitivas.jsonl
+uv run python evals/run.py --verificar evals/resultados/<corrida>.jsonl  # solo recalifica
 ```
-
-**Resultados:** pendiente de la primera corrida. Meta de la v1: 24/30. Pegar aquí la tabla de `evals/resultados/ultimo.md` (acierto, tokens, costo en USD, latencia y llamadas a herramientas por pregunta).
 
 ## Servidor MCP en Claude Desktop
 
-En `claude_desktop_config.json`:
+El servidor publica las cinco herramientas con el mismo esquema y la misma descripción que ve el agente, y una prueba ([tests/test_mcp_server.py](tests/test_mcp_server.py)) verifica que no se desincronicen. Para usarlo, en `claude_desktop_config.json`:
 
 ```json
 {
@@ -115,11 +135,16 @@ En `claude_desktop_config.json`:
 
 ## Modelos y costo
 
-Claude Sonnet 5.5 por defecto y Claude Haiku 5.5 como opción barata, elegidos con la variable `MODEL`. Con Sonnet se activa el *fallback* del servidor (`fallbacks: "default"`) por si el modelo rechaza una petición. El prompt de sistema y las herramientas van en caché. Máximo 8 llamadas a herramientas por pregunta.
+El agente funciona con dos proveedores, elegidos con `PROVEEDOR`:
+
+- **`anthropic`:** Claude Sonnet 5.5 por defecto y Claude Haiku 5.5 como opción barata, con la variable `MODEL`. Con Sonnet se activa el *fallback* del servidor (`fallbacks: "default"`) por si el modelo rechaza una petición. El prompt de sistema y las herramientas van en caché.
+- **`gemini`:** Gemini 3.5 Flash-Lite en la cuota gratuita, con Gemini 3.1 Flash-Lite de respaldo cuando el principal está saturado. Con este proveedor se hizo la evaluación final.
+
+En los dos casos el bucle está escrito a mano y el máximo es de 8 llamadas a herramientas por pregunta.
 
 ## Demo pública
 
-La demo de Streamlit usa Haiku con un límite de 5 preguntas por sesión, o Sonnet sin límite si el visitante pega su propia llave. Oculta la cédula de las personas naturales. Para Streamlit Community Cloud se usa `requirements.txt` y la llave va en los *secrets* como `ANTHROPIC_API_KEY`. Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
+La demo de Streamlit usa el proveedor configurado (Gemini en la cuota gratuita, el mismo de la evaluación) con un límite de 5 preguntas por sesión, o Claude Sonnet sin límite si el visitante pega su propia llave de Anthropic. Oculta la cédula de las personas naturales. Para Streamlit Community Cloud se usa `requirements.txt` y en los *secrets* van `PROVEEDOR`, `GEMINI_API_KEY` y `MODELGEMINI` (o `ANTHROPIC_API_KEY` si la demo usa Claude). Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
 
 ## Estructura
 
@@ -130,15 +155,18 @@ secop-agent/
 │   ├── schema.py         # columnas reales, normalización, validación, SoQL
 │   ├── tools.py          # herramientas que ven el agente y el MCP
 │   ├── alerts.py         # las 4 señales, sin LLM
-│   ├── agent.py          # bucle del agente con tool use
+│   ├── agent.py          # bucle del agente con tool use (Claude)
+│   ├── agent_gemini.py   # el mismo bucle con Gemini
 │   ├── mcp_server.py     # mismas herramientas por MCP
 │   └── __main__.py       # CLI
 ├── app/streamlit_app.py
 ├── scripts/fase0_esquema.py
-├── evals/preguntas.jsonl
+├── evals/preguntas.jsonl             # set de desarrollo (30)
+├── evals/preguntas_definitivas.jsonl # set definitivo (50)
 ├── evals/run.py
+├── evals/resultados/                 # corridas, métricas y calificación manual
 ├── tests/                # sin red, con respuestas grabadas
-└── docs/schema.json
+└── docs/                 # esquema, versiones del prompt y evaluación definitiva
 ```
 
 ## Datos

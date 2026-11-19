@@ -1,0 +1,7 @@
+# ### Archivo: requirements.txt ###
+# Autor: Juan Camilo Agudelo (Jagudelo14)
+# Correo: camiloagu1401@gmail.com
+# Fecha: 2026-11-16
+# Descripción: Dependencias para Streamlit Community Cloud
+
+.[demo]
