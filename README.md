@@ -18,7 +18,7 @@ Qué muestra este repo:
 1. **Un agente con herramientas sobre una API real con datos sucios.** El bucle de *tool use* está escrito a mano con el SDK `anthropic`, sin LangChain ([agent.py](src/secop_agent/agent.py)).
 2. **Un servidor MCP propio** que expone las mismas herramientas ([mcp_server.py](src/secop_agent/mcp_server.py)).
 3. **Calidad medida** con un set de desarrollo de 30 preguntas y una evaluación final de 50 que el agente vio una sola vez, con respuestas correctas recalculadas en vivo ([evals/](evals/), [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md)). **Resultado a ciegas: 37/50 (74%), 0 enlaces inventados de 453.** Después de corregir los fallos encontrados: 43/50 (86%).
-4. **Se corre en cinco minutos.**
+4. **Se corre en cinco minutos**, o se prueba en la [demo en línea](https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app).
 
 ## Arranque en cinco minutos
 
@@ -155,6 +155,8 @@ El agente funciona con dos proveedores, elegidos con `PROVEEDOR`:
 En los dos casos el bucle está escrito a mano y el máximo es de 8 llamadas a herramientas por pregunta.
 
 ## Demo pública
+
+**En línea:** https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app
 
 La demo de Streamlit usa el proveedor configurado (Gemini en la cuota gratuita, el mismo de la evaluación) con un límite de 5 preguntas por sesión, o Claude Sonnet sin límite si el visitante pega su propia llave de Anthropic. Oculta la cédula de las personas naturales. Para Streamlit Community Cloud, los *secrets* van como en [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example): `PROVEEDOR`, `GEMINI_API_KEY`, `MODELGEMINI` y `GEMINI_RESPALDO` (o `ANTHROPIC_API_KEY` si la demo usa Claude). La app los pasa a variables de entorno al arrancar. Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
 
