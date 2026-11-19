@@ -72,14 +72,18 @@ FILTROS_PERMITIDOS = {
     "anio_desde",
     "anio_hasta",
     "objeto_contiene",
+    "objeto_contiene_todas",
+    "nombre_entidad_contiene",
     "tipo_persona",
     "duracion_min_dias",
+    "duracion_mayor_que_dias",
     "modalidades",
     "tipo_de_contrato",
     "departamento",
     "ciudad",
     "documento_proveedor",
     "valor_min",
+    "valor_mayor_que",
     "valor_max",
     "estado_contrato",
 }
@@ -223,13 +227,15 @@ def validar_filtros(filtros):
     if limpios.get("anio_desde", 0) > limpios.get("anio_hasta", 9999):
         raise ValueError("anio_desde no puede ser mayor que anio_hasta")
 
-    if filtros.get("objeto_contiene"):
-        palabras = filtros["objeto_contiene"]
-        palabras = palabras if isinstance(palabras, list) else [palabras]
-        palabras = [str(p).strip() for p in palabras if str(p).strip()]
-        if not palabras or any(len(p) < 3 for p in palabras):
-            raise ValueError("objeto_contiene necesita palabras de al menos 3 letras")
-        limpios["objeto_contiene"] = palabras
+    # listas de palabras
+    for campo in ("objeto_contiene", "objeto_contiene_todas", "nombre_entidad_contiene"):
+        if filtros.get(campo):
+            palabras = filtros[campo]
+            palabras = palabras if isinstance(palabras, list) else [palabras]
+            palabras = [str(p).strip() for p in palabras if str(p).strip()]
+            if not palabras or any(len(p) < 3 for p in palabras):
+                raise ValueError(f"{campo} necesita palabras de al menos 3 letras")
+            limpios[campo] = palabras
 
     if filtros.get("tipo_persona"):
         tipo = normalizar_texto(filtros["tipo_persona"]).lower()
@@ -237,11 +243,12 @@ def validar_filtros(filtros):
             raise ValueError("tipo_persona debe ser 'natural' o 'juridica'")
         limpios["tipo_persona"] = tipo
 
-    if filtros.get("duracion_min_dias") is not None:
-        dias = int(filtros["duracion_min_dias"])
-        if dias <= 0:
-            raise ValueError("duracion_min_dias debe ser mayor que 0")
-        limpios["duracion_min_dias"] = dias
+    for campo in ("duracion_min_dias", "duracion_mayor_que_dias"):
+        if filtros.get(campo) is not None:
+            dias = int(filtros[campo])
+            if dias <= 0:
+                raise ValueError(f"{campo} debe ser mayor que 0")
+            limpios[campo] = dias
 
     if filtros.get("modalidades"):
         modalidades = filtros["modalidades"]
@@ -263,7 +270,7 @@ def validar_filtros(filtros):
             limpios[campo] = str(filtros[campo]).strip()
 
     # montos a número
-    for campo in ("valor_min", "valor_max"):
+    for campo in ("valor_min", "valor_mayor_que", "valor_max"):
         if filtros.get(campo) is not None:
             limpios[campo] = a_numero(filtros[campo])
 
@@ -310,8 +317,15 @@ def construir_where(filtros):
         else:
             condiciones.append(f"codigo_entidad = {codigos}")
     if "nombre_entidad_empieza" in filtros:
-        # sin importar tildes
-        condiciones.append(_like_alguna("nombre_entidad", [filtros["nombre_entidad_empieza"]], inicio=""))
+        # sin importar tildes ni espacios dobles
+        inicio = re.sub(r"\s+", "%", filtros["nombre_entidad_empieza"])
+        condiciones.append(_like_alguna("nombre_entidad", [inicio], inicio=""))
+    if "nombre_entidad_contiene" in filtros:
+        # las alcaldías también se registran como municipio
+        nombres = list(filtros["nombre_entidad_contiene"])
+        if any(quitar_tildes(n).upper().startswith("ALCALD") for n in nombres) and not any(quitar_tildes(n).upper().startswith("MUNICIPIO") for n in nombres):
+            nombres.append("MUNICIPIO")
+        condiciones.append(_like_alguna("nombre_entidad", nombres))
     if "nit_entidad" in filtros:
         condiciones.append(f"nit_entidad = {filtros['nit_entidad']}")
     if "documento_proveedor" in filtros:
@@ -325,6 +339,10 @@ def construir_where(filtros):
     if "objeto_contiene" in filtros:
         # alguna palabra, sin tildes
         condiciones.append(_like_alguna("objeto_del_contrato", filtros["objeto_contiene"]))
+    if "objeto_contiene_todas" in filtros:
+        # cada palabra tiene que estar
+        for palabra in filtros["objeto_contiene_todas"]:
+            condiciones.append(_like_alguna("objeto_del_contrato", [palabra]))
     if filtros.get("tipo_persona") == "juridica":
         condiciones.append(f"tipodocproveedor in ({', '.join(texto_soql(d) for d in DOCUMENTOS_JURIDICA)})")
     if filtros.get("tipo_persona") == "natural":
@@ -333,6 +351,10 @@ def construir_where(filtros):
     if "duracion_min_dias" in filtros:
         condiciones.append(
             f"date_diff_d(fecha_de_fin_del_contrato, fecha_de_inicio_del_contrato) >= {filtros['duracion_min_dias']}"
+        )
+    if "duracion_mayor_que_dias" in filtros:
+        condiciones.append(
+            f"date_diff_d(fecha_de_fin_del_contrato, fecha_de_inicio_del_contrato) > {filtros['duracion_mayor_que_dias']}"
         )
     if "modalidades" in filtros:
         lista = ", ".join(texto_soql(m) for m in filtros["modalidades"])
@@ -349,6 +371,8 @@ def construir_where(filtros):
 
     if "valor_min" in filtros:
         condiciones.append(f"valor_del_contrato >= {filtros['valor_min']:.0f}")
+    if "valor_mayor_que" in filtros:
+        condiciones.append(f"valor_del_contrato > {filtros['valor_mayor_que']:.0f}")
     if "valor_max" in filtros:
         condiciones.append(f"valor_del_contrato <= {filtros['valor_max']:.0f}")
 

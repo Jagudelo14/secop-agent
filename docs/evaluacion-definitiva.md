@@ -301,7 +301,7 @@ La latencia la domina datos.gov.co, no el modelo. Algunas llamadas a `buscar_ent
 
 ### Errores (13)
 
-Según el protocolo, los errores se documentan como hallazgos y el agente no se corrige.
+Según el protocolo, los errores se documentan como hallazgos y el agente v7 no se corrige. Las correcciones posteriores (v8 y v9) están al final, en una sección aparte.
 
 | Pregunta | Tipo | Qué pasó |
 | --- | --- | --- |
@@ -346,3 +346,54 @@ Las razones completas están en `evals/resultados/20261118-085949-manual.json`. 
 | P50 Cumplimiento | Acierto | Declina sin dar datos |
 
 Todas las cifras que citan las respuestas de P41–P50 se contrastaron contra datos.gov.co. Los tres casos marcados como límite son los que el autor puede querer revisar. Si se cambian a fallo, el acierto baja a 34/50 (68%).
+
+## Después de la evaluación: v8 y v9 (no son medición a ciegas)
+
+El resultado de la evaluación definitiva es el de la v7: **37/50 (74%)**. Lo que sigue se hizo después, por decisión del autor, para corregir los fallos que encontró esa evaluación. Las dos versiones se ajustaron mirando las respuestas de este mismo set, así que sus números son optimistas y no reemplazan al 74%: miden cuánto mejora el agente cuando se corrigen fallos conocidos, no cómo le va con preguntas nuevas.
+
+| Corrida | Prompt | Acierto | Conteo | Ranking | Filtro | Ambigua | Fuera de alcance | Enlaces inventados |
+| --- | --- | --- | --- | --- | --- | --- | --- | --- |
+| `20261118-085949` | v7 (a ciegas, oficial) | 37/50 (74%) | 13/15 | 12/15 | 3/10 | 4/5 | 5/5 | 0/453 |
+| `20261119-084906` | v8 | 39/50 (78%) | 11/15 | 15/15 | 5/10 | 3/5 | 5/5 | 2/425 |
+| `20261119-160009` | v9 | 43/50 (86%) | 14/15 | 15/15 | 5/10 | 4/5 | 5/5 | 0/652 |
+
+Las preguntas que Gemini o datos.gov.co dejaron sin respuesta se repitieron igual que en la v7. En la v8 fueron 16 (P01, P13, P14, P16, P17, P23, P25, P28, P33, P35, P40, P43, P46, P47, P48 y P50; P14, P16 y P17 dos veces) y P43 una vez más porque datos.gov.co no respondió a ninguna consulta. En la v9 solo P06. Las calificaciones manuales de P41–P50 están en `evals/resultados/<corrida>-manual.json`, con la razón de cada una y las cifras contrastadas en vivo.
+
+### v8: cambios generales a partir de los errores
+
+| Cambio | Errores que apunta |
+| --- | --- |
+| `buscar_entidad` devuelve `entidad_completa`: la gobernación o alcaldía con todas sus dependencias, aunque estén registradas con otro prefijo o con doble espacio | P08, P20, P23, P32 |
+| Aviso de municipios homónimos en varios departamentos (`homonimas`) | P33 |
+| Filtros estrictos `valor_mayor_que` y `duracion_mayor_que_dias` para "superior a" | P14, P34 |
+| `objeto_contiene_todas` para temas que juntan dos ideas | P37 |
+| `nombre_entidad_contiene` para "las alcaldías de un departamento" | P38 |
+| Agrupar por objeto del contrato | P24 |
+| El texto de cada enlace es el id del contrato | P31 |
+
+Resultado: arregló P08, P20, P23, P24, P31 y P37, pero dañó P03, P04 y P11 (ver v9) y P43, y por primera vez aparecieron enlaces inventados (2, uno en P50: un enlace de búsqueda de SECOP que no salió de ninguna herramienta).
+
+### v9: corrección de la v8
+
+| Cambio | Errores que apunta |
+| --- | --- |
+| `entidad_completa` solo toma nombres en los que el tipo abre un tramo del nombre seguido del lugar ("MUNICIPIO DE MANIZALES", "DEPARTAMENTO DE CUNDINAMARCA - SECRETARÍA…"). En la v8 sumaba entidades autónomas que tienen el lugar en el nombre: la Contraloría de Manizales, la ESE de Villavicencio, la Contraloría de Córdoba, un sindicato del Valle y una asociación de municipios del Tolima | P03, P04, P11 |
+| `nombre_entidad_contiene` con ALCALDIA también busca MUNICIPIO | P38 |
+| Prompt: meses a días con 30,44 días por mes (6 meses = 183) | P14 |
+| Prompt: un programa con sigla conocida se busca por nombre completo y sigla. El ejemplo de la regla ("alimentación escolar es PAE") es el de la propia pregunta P38, así que esta regla está ajustada a la respuesta correcta | P38 |
+
+Antes de correr las 50 se probaron solo P03, P04, P11, P14 y P38: 5/5 (`20261119-155020`). En la corrida completa la v9 arregló esas cinco, P33 y P44, y falló P07, P37 y P40, que la v8 tenía bien.
+
+### Errores de la v9 (7)
+
+| Pregunta | Tipo | Qué pasó |
+| --- | --- | --- |
+| P07 | Conteo | Resolvió bien la entidad, pero por su cuenta excluyó un contrato de 2021 que consideró atípico. La respuesta correcta lo incluye |
+| P32 | Filtro | La respuesta correcta deja por fuera "GOBERNACIÓN VALLE DEL CAUCA -SECRETARIA DE SALUD" (sin "del"); el agente la incluye |
+| P34 | Filtro | La Gobernación del Tolima está registrada como "GOBIERNO DEPARTAMENTAL", sin el lugar en el nombre, y el agente no la encontró |
+| P35 | Filtro | La búsqueda sin tildes también encuentra "TECNÓLOGO" y la respuesta correcta no; sobran 16 |
+| P37 | Filtro | Buscó "vías" con O en vez de exigir "mantenimiento" y "vía" juntas. Probablemente lo causó la regla nueva de buscar por frase completa |
+| P40 | Filtro | Mezcló palabras genéricas ("construcción", "adecuación") con las deportivas; sobran 15 |
+| P43 | Ambigua | Eligió en silencio la Universidad Nacional de Colombia y respondió $0 sin mencionar otras candidatas |
+
+La v9 no llegó a la meta de 90% que se propuso el autor. No se hizo otra ronda: cada regla nueva del prompt arregla una pregunta y puede dañar otra (P37 es el ejemplo), y seguir ajustando sobre este mismo set haría el número cada vez menos creíble.

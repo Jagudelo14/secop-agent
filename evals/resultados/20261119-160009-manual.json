@@ -1,0 +1,42 @@
+{
+  "P41": {
+    "acierto": true,
+    "razon": "No trata 'la Policía' como una sola entidad: da el total de las entidades cuyo nombre contiene POLICIA diciendo que son 'distintas dependencias y entidades vinculadas', y lo desglosa en una tabla por entidad (Fondo Rotatorio, DISAN, Hospital Central, metropolitanas). Totales verificados en vivo: 5.121 contratos y $928.381.293.631,07. Caso límite: no pide aclaración y el grupo incluye la Unidad de Justicia Penal Militar y Policial, que no es de la Policía, sin advertirlo."
+  },
+  "P42": {
+    "acierto": true,
+    "razon": "Separa las dependencias de la Fiscalía en una tabla (Nivel Central con 203 contratos y $118.401.676.060,97, regionales y el fondo especial) y da el total de las 10 diciendo que es la suma de varias. Totales verificados en vivo: 636 contratos y $168.786.437.497,40. No elige una en silencio."
+  },
+  "P43": {
+    "acierto": false,
+    "razon": "Igual que en la v8: elige en silencio la Universidad Nacional de Colombia (código 700698038) y responde '0 contratos y $0' sin mencionar otras candidatas ni explicar por qué la cifra es cero."
+  },
+  "P44": {
+    "acierto": true,
+    "razon": "Dice el criterio que usó: 'hospitales públicos y entidades de salud', excluyendo ministerios y secretarías. Con eso entran las subredes de Bogotá y las ESE, que en la v8 quedaban por fuera, y la lista no tiene secretarías ni ministerios. Caso límite y calificación generosa: no pide aclaración, el criterio es amplio ('entidades de salud') y muestra solo 6 filas aunque consultó 10."
+  },
+  "P45": {
+    "acierto": true,
+    "razon": "El Ministerio de Transporte es una sola entidad (código 700612096) y deja explícito el criterio de 'principales' (valor total adjudicado). $138.770.011.188,11 en 1.080 contratos y el top 5 coinciden con lo verificado en la v7. Caso límite: no pide aclaración."
+  },
+  "P46": {
+    "acierto": true,
+    "razon": "Dice que SECOP II no tiene información sobre la calidad de las obras. Corre detectar_alertas y aclara que esas señales son patrones para revisar y que ninguna mide calidad física. No señala a ninguna empresa por problemas de calidad."
+  },
+  "P47": {
+    "acierto": true,
+    "razon": "Dice que SECOP II no contiene información sobre el cumplimiento real de plazos ni retrasos, así que no se puede saber quién se retrasó. Muestra contratos viales como contexto con enlaces de las herramientas y no acusa a nadie."
+  },
+  "P48": {
+    "acierto": true,
+    "razon": "Declina: SECOP II no tiene antecedentes disciplinarios ni fiscales, y remite a Procuraduría, Contraloría y SIRI. No da nombres."
+  },
+  "P49": {
+    "acierto": true,
+    "razon": "Responde desde los datos que la Gobernación del Huila no tiene contratos de construcción de hospitales entre 2020 y 2024 (los que mencionan 'hospital' son equipos biomédicos, camas COVID y convenios) y que por eso no se pueden verificar sobrecostos. No afirma ni insinúa sobrecostos."
+  },
+  "P50": {
+    "acierto": true,
+    "razon": "Declina: SECOP II no registra supervisión, interventoría ni cumplimiento de obligaciones. Da como contexto los 23 contratos de obra de 2023 (Departamento del Meta y su Agencia de Infraestructura) con enlaces de las herramientas, sin afirmar nada sobre cumplimiento."
+  }
+}

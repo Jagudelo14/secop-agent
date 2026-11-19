@@ -132,3 +132,25 @@ def test_ranking_por_ciudad_saca_no_definido(monkeypatch):
     assert "ciudad != 'No Definido'" in agrupada["$where"]
     assert r["sin_ubicacion"]["num_contratos"] == 7
     assert [g["clave"] for g in r["grupos"]] == ["Ciudad A"]
+
+
+def test_lugar_de_entidad_territorial():
+    raices = tools.TIPOS_TERRITORIALES["gobernación"]
+    assert tools._es_de_lugar("SECRETARIA GENERAL- GOBERNACION DEL VALLE", raices, ["VALLE", "CAUCA"])
+    assert tools._es_de_lugar("GOBERNACIÓN VALLE DEL CAUCA -SECRETARIA DE SALUD", raices, ["VALLE", "CAUCA"])
+    assert not tools._es_de_lugar("GOBERNACION NORTE DE SANTANDER", raices, ["SANTANDER"])
+    assert not tools._es_de_lugar("DEPARTAMENTO ADMINISTRATIVO DE PLANEACION DEL VALLE", raices, ["VALLE", "CAUCA"])
+    alcaldia = tools.TIPOS_TERRITORIALES["alcaldía"]
+    assert tools._es_de_lugar("SANTIAGO DE CALI  DISTRITO ESPECIAL - SECRETARIA DE CULTURA", alcaldia, ["CALI"])
+    assert not tools._es_de_lugar("ALCALDIA DE CALIMA", alcaldia, ["CALI"])
+
+
+def test_entidades_autonomas_no_son_dependencias():
+    # contralorías, ESE y asociaciones tienen el lugar en el nombre pero no son la alcaldía
+    alcaldia = tools.TIPOS_TERRITORIALES["alcaldía"]
+    gobernacion = tools.TIPOS_TERRITORIALES["gobernación"]
+    assert tools._es_de_lugar("ALCALDIA MUNICIPIO DE VILLAVICENCIO", alcaldia, ["VILLAVICENCIO"])
+    assert not tools._es_de_lugar("CONTRALORIA GENERAL DEL MUNICIPIO DE MANIZALES", alcaldia, ["MANIZALES"])
+    assert not tools._es_de_lugar("EMPRESA SOCIAL DEL ESTADO DEL MUNICIPIO DE VILLAVICENCIO", alcaldia, ["VILLAVICENCIO"])
+    assert not tools._es_de_lugar("ASOCIACION DE MUNICIPIOS DEL CENTRO DEL DEPARTAMENTO DEL TOLIMA", gobernacion, ["TOLIMA"])
+    assert not tools._es_de_lugar("SINDICATO DE TRABAJADORES DE CLINICAS Y HOSPITALES DEL DEPARTAMENTO DEL VALLE", gobernacion, ["VALLE", "CAUCA"])

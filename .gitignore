@@ -13,6 +13,11 @@ __pycache__/
 evals/resultados/*
 !evals/resultados/20261118-085949*
 !evals/resultados/definitiva*.log
+!evals/resultados/20261119-084906*
+!evals/resultados/20261119-155020*
+!evals/resultados/20261119-160009*
+!evals/resultados/v8-*.log
+!evals/resultados/v9-*.log
 docs/muestra.json
 .env.*
 !.env.example

@@ -1,0 +1,51 @@
+Corrida: C:\Users\camilo\Desktop\Proyecto Agente IA\secop-agent\evals\resultados\20261119-084906.jsonl
+P01 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P02 gemini-3.5-flash-lite · 19,487/572 tokens · 157.97s · 2 herr.
+P03 gemini-3.5-flash-lite · 16,560/278 tokens · 239.27s · 2 herr.
+P04 gemini-3.5-flash-lite · 18,735/149 tokens · 64.01s · 2 herr.
+P05 gemini-3.5-flash-lite · 9,619/220 tokens · 53.04s · 1 herr.
+P06 gemini-3.1-flash-lite · 24,181/143 tokens · 645.51s · 3 herr.
+P07 gemini-3.1-flash-lite · 16,444/462 tokens · 275.19s · 2 herr.
+P08 gemini-3.5-flash-lite · 23,242/425 tokens · 59.25s · 2 herr.
+P09 gemini-3.5-flash-lite · 23,750/1,063 tokens · 108.17s · 2 herr.
+P10 gemini-3.5-flash-lite · 20,748/796 tokens · 86.29s · 2 herr.
+P11 gemini-3.5-flash-lite · 21,558/537 tokens · 171.31s · 2 herr.
+P12 gemini-3.5-flash-lite · 40,447/163 tokens · 34.3s · 2 herr.
+P13 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P14 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P15 gemini-3.5-flash-lite · 20,027/460 tokens · 149.35s · 4 herr.
+P16 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P17 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P18 gemini-3.5-flash-lite · 13,450/1,225 tokens · 147.55s · 1 herr.
+P19 gemini-3.1-flash-lite · 13,411/606 tokens · 52.83s · 1 herr.
+P20 gemini-3.5-flash-lite · 20,109/1,656 tokens · 82.58s · 2 herr.
+P21 gemini-3.5-flash-lite · 12,792/1,534 tokens · 23.24s · 1 herr.
+P22 gemini-3.5-flash-lite · 17,363/1,187 tokens · 62.97s · 1 herr.
+P23 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P24 gemini-3.5-flash-lite · 20,909/1,880 tokens · 89.92s · 2 herr.
+P25 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P26 gemini-3.1-flash-lite · 13,347/1,299 tokens · 60.28s · 1 herr.
+P27 gemini-3.5-flash-lite · 17,285/1,181 tokens · 122.8s · 1 herr.
+P28 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P29 gemini-3.5-flash-lite · 15,352/751 tokens · 66.83s · 1 herr.
+P30 gemini-3.5-flash-lite · 12,921/1,352 tokens · 166.78s · 1 herr.
+P31 gemini-3.5-flash-lite · 32,112/6,498 tokens · 36.91s · 1 herr.
+P32 gemini-3.5-flash-lite · 13,742/102 tokens · 553.92s · 2 herr.
+P33 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P34 gemini-3.1-flash-lite · 38,794/276 tokens · 481.08s · 5 herr.
+P35 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P36 gemini-3.1-flash-lite · 32,397/5,963 tokens · 74.66s · 2 herr.
+P37 gemini-3.1-flash-lite · 22,763/2,985 tokens · 34.56s · 1 herr.
+P38 gemini-3.1-flash-lite · 45,411/727 tokens · 382.96s · 3 herr.
+P39 gemini-3.5-flash-lite · 27,043/2,508 tokens · 258.98s · 2 herr.
+P40 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P41 gemini-3.1-flash-lite · 25,958/173 tokens · 270.64s · 2 herr.
+P42 gemini-3.1-flash-lite · 62,058/257 tokens · 79.38s · 4 herr.
+P43 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.1-flash-lite): 503 UNAVAILABLE. {'er
+P44 gemini-3.1-flash-lite · 15,476/1,378 tokens · 129.42s · 1 herr.
+P45 gemini-3.1-flash-lite · 21,473/814 tokens · 446.22s · 3 herr.
+P46 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.1-flash-lite): 503 UNAVAILABLE. {'er
+P47 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P48 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P49 gemini-3.1-flash-lite · 36,918/261 tokens · 337.78s · 2 herr.
+P50 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)

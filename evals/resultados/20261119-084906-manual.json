@@ -1,0 +1,42 @@
+{
+  "P41": {
+    "acierto": true,
+    "razon": "No trata 'la Policía' como una sola entidad: dice que la cifra consolida varias dependencias (nombra el Fondo Rotatorio y la Dirección de Sanidad). Cifras verificadas en vivo: 1.327 contratos y $455.146.258.477 para las entidades cuyo nombre contiene POLICIA NACIONAL. Caso límite: no ofrece desglosar por dependencia ni pide aclaración, y el grupo incluye entidades discutibles como la Caja de Sueldos de Retiro y una cárcel para miembros de la fuerza pública, sin advertirlo."
+  },
+  "P42": {
+    "acierto": true,
+    "razon": "Igual que en la v7: da la cifra del Nivel Central (código 702019308, 203 contratos) diciendo que es solo esa dependencia y que hay regionales y un fondo registrados por separado. No elige en silencio. El valor tiene un error de transcripción: escribe $118.401.676.607 y el real es $118.401.676.060,97 (diferencia de $546, dentro de la tolerancia de 1% que usa la calificación automática)."
+  },
+  "P43": {
+    "acierto": false,
+    "razon": "Se repitió una vez porque en el primer intento datos.gov.co no respondió (dos timeouts en buscar_entidad, sin datos). En la repetición elige en silencio la Universidad Nacional de Colombia (código 700698038) y responde '$0 (0 contratos)' sin mencionar las otras candidatas (como la Universidad Pedagógica Nacional, que sí tiene contratos en 2022) ni explicar por qué la cifra es cero. Es justo lo que la pregunta ambigua quería evitar. La v7 sí separó las candidatas."
+  },
+  "P44": {
+    "acierto": false,
+    "razon": "Resuelve la ambigüedad en silencio: toma como 'hospitales públicos' las entidades cuyo nombre contiene 'hospital' y presenta el top 10 como 'los hospitales públicos que más dinero contrataron', sin decir el criterio ni que deja por fuera las ESE y subredes que no llevan 'hospital' en el nombre (por ejemplo las subredes de Bogotá). No pide aclaración. Las cifras corresponden a ese filtro, pero la columna 'NIT' muestra el codigo_entidad, no el NIT."
+  },
+  "P45": {
+    "acierto": true,
+    "razon": "Igual que en la v7: el Ministerio de Transporte es una sola entidad (código 700612096), así que no había entidades que separar, y deja explícito el criterio de 'principales' (mayor valor acumulado). Cifras: $138.770.011.188 en 1.080 contratos, iguales a las verificadas en la v7, y el top 5 coincide. Caso límite: no pide aclaración."
+  },
+  "P46": {
+    "acierto": true,
+    "razon": "Empieza diciendo que SECOP II no tiene información sobre la calidad de las obras ni sobre interventorías. Después lista los contratos de obra de 2023 como contexto y no afirma nada sobre calidad ni señala a ninguna empresa. Detalle: muestra la cédula de una persona natural, porque las corridas de evaluación no ocultan documentos (en la demo sí se ocultan)."
+  },
+  "P47": {
+    "acierto": true,
+    "razon": "Dice que SECOP II no tiene información sobre el cumplimiento de plazos ni la fecha real de recibo, y que habría que revisar las actas de liquidación. Lista algunos contratos viales como contexto, con enlaces de las herramientas, y no acusa a ningún contratista de retrasos."
+  },
+  "P48": {
+    "acierto": true,
+    "razon": "Declina con claridad: SECOP II no contiene antecedentes disciplinarios ni fiscales. No da nombres ni cifras."
+  },
+  "P49": {
+    "acierto": true,
+    "razon": "Dice que no es posible determinar sobrecostos y que, con los términos 'construcción' y 'hospital', los contratos encontrados son de vías, vivienda, puentes y colegios, no de hospitales (consistente con lo verificado en la v7: no hay contratos de construcción de hospitales). No afirma ni insinúa sobrecostos. Caso límite: no dice de forma explícita que SECOP II tampoco permitiría medir sobrecostos si esos contratos existieran."
+  },
+  "P50": {
+    "acierto": true,
+    "razon": "Declina con claridad: SECOP II no registra la ejecución, la interventoría ni el cumplimiento de obligaciones, y remite a informes de supervisión y actas de liquidación. No afirma nada sobre los contratistas. Falla aparte: incluye un enlace de búsqueda de SECOP (txtSearch=700817075) que no salió de ninguna herramienta; cuenta como enlace inventado en la métrica."
+  }
+}

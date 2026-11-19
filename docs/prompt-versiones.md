@@ -186,6 +186,18 @@ La v6 solo se había probado a nivel de herramienta. Al correr el agente complet
 
 Con eso se cumplió el criterio de parada y **la v7 quedó congelada** para la evaluación definitiva.
 
+## Iteraciones 8 y 9 — después de la evaluación definitiva
+
+Después de la evaluación definitiva (v7, 37/50), el autor decidió corregir los fallos encontrados. La v8 y la v9 se ajustaron mirando las respuestas del set de 50, así que sus resultados no son a ciegas:
+
+| Corrida | Prompt | Set | Resultado | Enlaces inventados |
+| --- | --- | --- | --- | --- |
+| `20261119-084906` | v8 | definitivo (50) | 39/50 | 2/425 |
+| `20261119-155020` | v9 | 5 preguntas corregidas | 5/5 | — |
+| `20261119-160009` | v9 | definitivo (50) | 43/50 | 0/652 |
+
+Qué cambió en cada una y por qué está en [evaluacion-definitiva.md](evaluacion-definitiva.md#después-de-la-evaluación-v8-y-v9-no-son-medición-a-ciegas). La v9 no se corrió sobre el set de desarrollo de 30.
+
 ## Set de prueba
 
 - **Archivo:** `evals/preguntas_prueba.jsonl`, 10 preguntas: 3 de conteo o suma, 3 de ranking, 2 de filtro y 2 fuera de alcance.

@@ -32,6 +32,7 @@ AGRUPACIONES = {
     "anio": {"clave": "date_extract_y(fecha_de_firma)", "nombre": None},
     "ciudad": {"clave": "ciudad", "nombre": None},
     "sector": {"clave": "sector", "nombre": None},
+    "objeto": {"clave": "objeto_del_contrato", "nombre": None},
 }
 
 METRICAS = {
@@ -103,9 +104,11 @@ def buscar_entidad(nombre, limite=10):
     parciales = [f for f in filas if f not in exactas and all(p in normalizar_texto(f.get("nombre_entidad")) for p in buscadas)]
     filas = (exactas + parciales or filas)[: min(int(limite), 50)]
 
+    completa = _entidad_completa(nombre)
     return {
         "nota": "codigo_entidad identifica una sola entidad; varias entidades pueden compartir NIT",
-        "sugerencia": None if filas else "Sin resultados: intenta con menos palabras o quita las palabras genéricas del tipo de entidad",
+        "sugerencia": None if filas or completa else "Sin resultados: intenta con menos palabras o quita las palabras genéricas del tipo de entidad",
+        "entidad_completa": completa,
         "dependencias": _dependencias(filas),
         "candidatas": [
             {
@@ -119,6 +122,98 @@ def buscar_entidad(nombre, limite=10):
             for f in filas
         ],
     }
+
+
+# ### Entidad completa ###
+# palabras que nombran el tipo de entidad territorial
+TIPOS_TERRITORIALES = {
+    "gobernación": ("GOBERNACION", "DEPARTAMENTO"),
+    "alcaldía": ("ALCALDIA", "MUNICIPIO", "DISTRITO"),
+}
+PALABRAS_VACIAS = {"DE", "DEL", "LA", "EL", "LOS", "LAS", "Y", "MUNICIPAL", "DISTRITAL", "DEPARTAMENTAL", "MAYOR"}
+
+
+def _tipo_territorial(palabras):
+    for tipo, raices in TIPOS_TERRITORIALES.items():
+        if palabras and palabras[0] in raices:
+            return tipo, raices
+    return None, None
+
+
+def _significativas(tokens, raices):
+    return [t for t in tokens if t not in PALABRAS_VACIAS and t not in raices]
+
+
+def _es_de_lugar(nombre, raices, lugar):
+    # cada tramo separado por guion; el tipo abre el tramo y sigue el lugar,
+    # o el lugar va antes de "distrito". Así no entran contralorías, ESE ni asociaciones
+    for tramo in re.split(r"-", str(nombre or "")):
+        tokens = normalizar_texto(tramo).split()
+        if not tokens:
+            continue
+        if tokens[0] in raices:
+            despues = _significativas(tokens[1:], raices)
+            if despues and despues[0] == lugar[0]:
+                return True
+        if "DISTRITO" in tokens:
+            antes = _significativas(tokens[:tokens.index("DISTRITO")], raices)
+            if antes and antes[-1] == lugar[-1] and len(antes) <= 2:
+                return True
+    return False
+
+
+def _entidad_completa(nombre):
+    palabras = normalizar_texto(nombre).split()
+    tipo, raices = _tipo_territorial(palabras)
+    if not tipo:
+        return None
+    lugar = _significativas(palabras[1:], raices)
+    if not lugar:
+        return None
+
+    # filtro amplio en el servidor, exacto en python
+    lugares = {lugar[0], lugar[-1]}
+    condicion_lugar = " OR ".join(f"upper(nombre_entidad) like {texto_soql('%' + patron_like(l) + '%')}" for l in lugares)
+    condicion_tipo = " OR ".join(f"upper(nombre_entidad) like {texto_soql('%' + patron_like(r[:8]) + '%')}" for r in raices)
+    filas = socrata.consultar({
+        "$select": "nombre_entidad, codigo_entidad, departamento, count(*) as num_contratos",
+        "$where": f"({condicion_lugar}) AND ({condicion_tipo})",
+        "$group": "nombre_entidad, codigo_entidad, departamento",
+        "$order": "num_contratos DESC",
+        "$limit": 500,
+    })
+    filas = [f for f in filas if _es_de_lugar(f.get("nombre_entidad"), raices, lugar)]
+    if not filas:
+        return None
+
+    # un código puede salir con varios departamentos
+    por_codigo = {}
+    for f in filas:
+        actual = por_codigo.setdefault(f["codigo_entidad"], {"nombre": f.get("nombre_entidad"), "departamento": f.get("departamento"), "num_contratos": 0})
+        actual["num_contratos"] += int(a_numero(f.get("num_contratos")))
+
+    resultado = {
+        "tipo": tipo,
+        "codigo_entidad": list(por_codigo),
+        "num_entidades": len(por_codigo),
+        "num_contratos": sum(e["num_contratos"] for e in por_codigo.values()),
+        "nombres": [e["nombre"] for e in sorted(por_codigo.values(), key=lambda e: -e["num_contratos"])[:8]],
+        "nota": f"Todas las entidades registradas como esta {tipo}, aunque tengan nombres distintos. Para tomarla completa filtra con codigo_entidad igual a esta lista.",
+    }
+
+    # municipios con el mismo nombre en varios departamentos
+    if tipo == "alcaldía":
+        departamentos = {}
+        for codigo, e in por_codigo.items():
+            if e["departamento"] and e["departamento"] != "No Definido":
+                grupo = departamentos.setdefault(e["departamento"], {"departamento": e["departamento"], "codigo_entidad": [], "num_contratos": 0})
+                grupo["codigo_entidad"].append(codigo)
+                grupo["num_contratos"] += e["num_contratos"]
+        if len(departamentos) > 1:
+            resultado["homonimas"] = sorted(departamentos.values(), key=lambda g: -g["num_contratos"])
+            resultado["nota"] = (f"Hay municipios con este nombre en {len(departamentos)} departamentos. Si la pregunta no dice cuál, "
+                                 "toma el de más contratos (el primero de homonimas) y aclara en la respuesta que existe otro.")
+    return resultado
 
 
 def _dependencias(filas):
@@ -365,19 +460,23 @@ ESQUEMA_FILTROS = {
             "description": "Código único de la entidad (sale de buscar_entidad), o una lista de códigos para tomar varias entidades juntas. Preferir sobre nit_entidad.",
         },
         "nombre_entidad_empieza": {"type": "string", "description": "Toma todas las entidades cuyo nombre empieza con este texto (sin importar tildes). Sirve cuando una entidad está registrada como varias dependencias que comparten el inicio del nombre."},
+        "nombre_entidad_contiene": {"type": "array", "items": {"type": "string"}, "description": "Toma las entidades cuyo nombre contiene alguna de estas palabras (sin importar tildes). Sirve para un tipo de entidad, combinado con departamento o ciudad: las alcaldías de un departamento, los hospitales de una ciudad. Usa raíces cortas."},
         "nit_entidad": {"type": "string", "description": "NIT de la entidad. Ojo: varias entidades pueden compartirlo."},
         "anio": {"type": "integer", "description": "Un solo año de la fecha de firma"},
         "anio_desde": {"type": "integer", "description": "Primer año de un rango de fechas de firma (incluido). No combinar con anio."},
         "anio_hasta": {"type": "integer", "description": "Último año de un rango de fechas de firma (incluido). No combinar con anio."},
         "objeto_contiene": {"type": "array", "items": {"type": "string"}, "description": "Palabras a buscar en el objeto del contrato, sin importar tildes. Basta con que aparezca una. Como se busca la palabra dentro del texto, usa la forma más corta (singular o raíz) para no perder variantes."},
+        "objeto_contiene_todas": {"type": "array", "items": {"type": "string"}, "description": "Palabras que tienen que aparecer todas en el objeto del contrato, sin importar tildes. Úsalo cuando el tema junta dos ideas (una actividad sobre una cosa); se puede combinar con objeto_contiene."},
         "tipo_persona": {"type": "string", "enum": ["natural", "juridica"], "description": "Tipo de contratista: natural (documento personal) o juridica (NIT)."},
-        "duracion_min_dias": {"type": "integer", "description": "Duración mínima del contrato en días, calculada entre la fecha de inicio y la de fin."},
+        "duracion_min_dias": {"type": "integer", "description": "Duración de al menos estos días (incluye el límite), calculada entre la fecha de inicio y la de fin."},
+        "duracion_mayor_que_dias": {"type": "integer", "description": "Duración estrictamente mayor que estos días (no incluye el límite). Úsalo para 'superior a', 'mayor a' o 'más de'."},
         "modalidades": {"type": "array", "items": {"type": "string", "enum": MODALIDADES}, "description": "Contratación directa = ['Contratación directa', 'Contratación Directa (con ofertas)']"},
         "tipo_de_contrato": {"type": "string", "enum": TIPOS_CONTRATO},
         "departamento": {"type": "string", "description": "Nombre completo del departamento, sin importar tildes; se compara contra los valores reales de SECOP"},
         "ciudad": {"type": "string", "description": "Nombre completo de la ciudad, sin importar tildes; se compara contra los valores reales de SECOP"},
         "documento_proveedor": {"type": "string", "description": "NIT o cédula del contratista, solo dígitos"},
-        "valor_min": {"type": "number", "description": "Valor mínimo del contrato en pesos"},
+        "valor_min": {"type": "number", "description": "Valor de al menos este monto en pesos (incluye el límite): 'desde', 'mínimo', 'al menos'."},
+        "valor_mayor_que": {"type": "number", "description": "Valor estrictamente mayor que este monto en pesos (no incluye el límite): 'superior a', 'mayor a'."},
         "valor_max": {"type": "number", "description": "Valor máximo del contrato en pesos"},
         "estado_contrato": {"type": "string"},
     },
@@ -387,7 +486,7 @@ ESQUEMA_FILTROS = {
 HERRAMIENTAS = [
     {
         "name": "buscar_entidad",
-        "description": "Busca entidades compradoras por nombre (sin importar tildes ni mayúsculas) y devuelve candidatas con codigo_entidad, NIT y número de contratos. Úsala antes de filtrar por entidad. Si hay varias candidatas que son entidades distintas, pide aclaración al usuario. Si el campo dependencias indica que son partes de una misma entidad, puedes tomarlas juntas.",
+        "description": "Busca entidades compradoras por nombre (sin importar tildes ni mayúsculas) y devuelve candidatas con codigo_entidad, NIT y número de contratos. Úsala antes de filtrar por entidad. Para una gobernación o alcaldía devuelve además entidad_completa: todos los códigos de sus dependencias aunque estén registradas con nombres distintos, y homonimas si hay municipios con el mismo nombre en varios departamentos. Si hay varias candidatas que son entidades distintas, pide aclaración al usuario. Si el campo dependencias indica que son partes de una misma entidad, puedes tomarlas juntas.",
         "input_schema": {
             "type": "object",
             "properties": {
@@ -424,7 +523,8 @@ HERRAMIENTAS = [
                         "Qué forma cada grupo. proveedor = contratista. entidad = entidad que contrata. "
                         "modalidad = modalidad de contratación. tipo_de_contrato = tipo de contrato. "
                         "departamento = departamento de la entidad. ciudad = municipio o ciudad de la entidad. "
-                        "anio = año de firma. sector = sector administrativo de la entidad."
+                        "anio = año de firma. sector = sector administrativo de la entidad. "
+                        "objeto = texto del objeto del contrato (para 'objetos contractuales' o 'conceptos' que más acumulan)."
                     ),
                 },
                 "metrica": {

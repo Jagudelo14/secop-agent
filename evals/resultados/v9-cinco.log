@@ -1,0 +1,61 @@
+Corrida: C:\Users\camilo\Desktop\Proyecto Agente IA\secop-agent\evals\resultados\20261119-155020.jsonl
+P03 gemini-3.5-flash-lite · 18,759/456 tokens · 220.82s · 2 herr.
+P04 gemini-3.5-flash-lite · 39,003/115 tokens · 73.14s · 2 herr.
+P11 gemini-3.5-flash-lite · 21,637/582 tokens · 72.45s · 2 herr.
+P14 gemini-3.5-flash-lite · 38,616/7,170 tokens · 129.32s · 2 herr.
+P38 gemini-3.5-flash-lite · 39,717/6,158 tokens · 61.0s · 2 herr.
+
+P03 OK  2 cifra(s) correctas
+P04 OK  2 cifra(s) correctas
+P11 OK  3 cifra(s) correctas
+P14 OK  1 cifra(s) correctas
+P38 OK  48 ids iguales
+## Métricas de evaluación — 2026-11-19 15:59
+
+**Acierto: 5/5 (100.0%)** · meta del SPEC: 24/30 (80%)
+
+Prompt: v9
+
+| Métrica | Valor |
+| --- | --- |
+| Aciertos | 5/5 (100.0%) |
+| Fallos (respuesta incorrecta) | 0/5 (0.0%) |
+| Errores del agente (no respondió) | 0/5 (0.0%) |
+| Preguntas con algún error de herramienta | 0/5 (0.0%) |
+| Llamadas a herramientas con error | 0/10 (0.0%) |
+| Preguntas que llegaron al límite de 8 llamadas | 0/5 (0.0%) |
+| Respuestas con datos que incluyen enlace | 4/5 (80.0%) |
+| Enlaces inventados (no vienen de ninguna herramienta) | 0/104 (0.0%) |
+| Herramientas por pregunta (promedio) | 2.0 |
+| Latencia promedio / mediana / p95 (s) | 111.3 / 73.1 / 220.8 |
+| Modelos que respondieron | gemini-3.5-flash-lite: 5 |
+
+### Por tipo de pregunta
+
+| Tipo | Acierto | Tokens entrada prom. | Tokens salida prom. | Latencia prom. (s) | Herramientas prom. |
+| --- | --- | --- | --- | --- | --- |
+| conteo_suma | 4/4 (100.0%) | 29,504 | 2,081 | 123.9 | 2.0 |
+| filtro | 1/1 (100.0%) | 39,717 | 6,158 | 61.0 | 2.0 |
+| **Total** | 5/5 (100.0%) | 31,546 | 2,896 | 111.3 | 2.0 |
+
+### Consumo y costo estimado
+
+**Tokens totales:** 157,732 de entrada · 14,481 de salida
+
+Costo estimado con los mismos tokens, sin caché (aproximado, cada proveedor tokeniza distinto):
+
+| Modelo | Costo total (USD) | Por pregunta (USD) | 1.000 preguntas (USD) |
+| --- | --- | --- | --- |
+| claude-sonnet-5-5 | 0.4603 | 0.09205 | 92.05 |
+| claude-haiku-5-5 | 0.0230 | 0.00460 | 4.60 |
+
+### Detalle
+
+| Id | Tipo | Resultado | Detalle | Tokens entrada | Tokens salida | Latencia (s) | Herramientas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| P03 | conteo_suma | acierto | 2 cifra(s) correctas | 18,759 | 456 | 220.82 | 2 |
+| P04 | conteo_suma | acierto | 2 cifra(s) correctas | 39,003 | 115 | 73.14 | 2 |
+| P11 | conteo_suma | acierto | 3 cifra(s) correctas | 21,637 | 582 | 72.45 | 2 |
+| P14 | conteo_suma | acierto | 1 cifra(s) correctas | 38,616 | 7,170 | 129.32 | 2 |
+| P38 | filtro | acierto | 48 ids iguales | 39,717 | 6,158 | 61.0 | 2 |
+

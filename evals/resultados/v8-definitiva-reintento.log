@@ -1,0 +1,12 @@
+Corrida: evals\resultados\20261119-084906.jsonl
+P01 gemini-3.5-flash-lite · 25,005/211 tokens · 155.54s · 3 herr.
+P13 gemini-3.5-flash-lite · 18,654/450 tokens · 32.45s · 2 herr.
+P14 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.1-flash-lite): 503 UNAVAILABLE. {'er
+P16 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P17 sin respuesta · 0/0 tokens · ERROR Ningún modelo de Gemini respondió (gemini-3.5-flash-lite, gemini-3.1-flash-lite)
+P23 gemini-3.5-flash-lite · 40,628/1,439 tokens · 269.36s · 3 herr.
+P25 gemini-3.1-flash-lite · 13,408/1,244 tokens · 136.64s · 1 herr.
+P28 gemini-3.1-flash-lite · 12,899/1,310 tokens · 105.72s · 1 herr.
+P33 gemini-3.1-flash-lite · 41,316/1,661 tokens · 634.8s · 3 herr.
+P35 gemini-3.1-flash-lite · 34,117/1,521 tokens · 196.24s · 2 herr.
+P40 gemini-3.1-flash-lite · 38,561/530 tokens · 263.28s · 4 herr.

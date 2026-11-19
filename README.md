@@ -17,7 +17,7 @@ Qué muestra este repo:
 
 1. **Un agente con herramientas sobre una API real con datos sucios.** El bucle de *tool use* está escrito a mano con el SDK `anthropic`, sin LangChain ([agent.py](src/secop_agent/agent.py)).
 2. **Un servidor MCP propio** que expone las mismas herramientas ([mcp_server.py](src/secop_agent/mcp_server.py)).
-3. **Calidad medida** con un set de desarrollo de 30 preguntas y una evaluación final de 50 que el agente vio una sola vez, con respuestas correctas recalculadas en vivo ([evals/](evals/), [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md)). **Resultado final: 37/50 (74%), 0 enlaces inventados de 453.**
+3. **Calidad medida** con un set de desarrollo de 30 preguntas y una evaluación final de 50 que el agente vio una sola vez, con respuestas correctas recalculadas en vivo ([evals/](evals/), [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md)). **Resultado a ciegas: 37/50 (74%), 0 enlaces inventados de 453.** Después de corregir los fallos encontrados: 43/50 (86%).
 4. **Se corre en cinco minutos.**
 
 ## Arranque en cinco minutos
@@ -50,13 +50,13 @@ Claude solo decide qué consultar y redacta la respuesta. Los montos, rankings y
 
 | Herramienta | Qué hace |
 | --- | --- |
-| `buscar_entidad(nombre)` | Candidatas con `codigo_entidad` y NIT, sin importar tildes; avisa cuando son dependencias de una misma entidad |
+| `buscar_entidad(nombre)` | Candidatas con `codigo_entidad` y NIT, sin importar tildes; arma la gobernación o alcaldía completa con sus dependencias y avisa de municipios homónimos |
 | `consultar_contratos(filtros)` | Lista contratos (máximo 5.000) con el conteo y la suma reales |
 | `agregar(filtros, agrupar_por, metrica)` | Rankings y totales agrupados en el servidor con `$group`, por contratista, entidad, ciudad, departamento, sector, año, modalidad o tipo |
 | `detectar_alertas(codigo_entidad, anio)` | Las 4 señales con los contratos que las generan |
 | `detalle_contrato(id_contrato)` | Un contrato con su enlace a SECOP |
 
-Los filtros son los mismos en todas: entidad (una, varias o por inicio del nombre), año o rango de años, palabras en el objeto, tipo de contratista (natural o jurídica), duración mínima, modalidad, tipo de contrato, lugar y rango de valor.
+Los filtros son los mismos en todas: entidad (una, varias, por inicio o por parte del nombre), año o rango de años, palabras en el objeto (alguna o todas), tipo de contratista (natural o jurídica), duración y valor con límite incluido o estricto, modalidad, tipo de contrato y lugar.
 
 ## Lo que salió del esquema real (fase 0)
 
@@ -110,6 +110,18 @@ Las respuestas correctas son consultas SoQL escritas a mano y se recalculan al c
 | Costo | USD 0 con la cuota gratuita de Gemini. Con los mismos tokens: USD 0,004 por pregunta en Claude Haiku 5.5 y USD 0,08 en Claude Sonnet 5.5 |
 
 No se llegó a la meta del SPEC (80%). La causa más frecuente de los 13 fallos es la resolución de entidades: SECOP registra una misma gobernación o alcaldía con nombres distintos (otro prefijo, doble espacio) y el filtro por inicio de nombre deja dependencias por fuera. Le siguen los filtros por texto, en los que el agente elige palabras clave distintas a las que definen la respuesta correcta, y dos errores por tomar "superior a" como "mayor o igual". Cuando falla, falla en cómo arma la consulta, no en inventar: no hay enlaces inventados y declinó bien las 5 preguntas fuera de alcance. El análisis de los 13 fallos está en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md#errores-13).
+
+### Después de la evaluación: v8 y v9
+
+Con esos fallos a la vista se hicieron dos versiones más. No reemplazan al 74%: se ajustaron mirando las respuestas de este mismo set, así que miden cuánto mejora el agente al corregir fallos conocidos, no cómo le va con preguntas nuevas.
+
+| Versión | Acierto | Conteo | Ranking | Filtro | Ambigua | Fuera de alcance | Enlaces inventados |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| v7, a ciegas (oficial) | 37/50 (74%) | 13/15 | 12/15 | 3/10 | 4/5 | 5/5 | 0/453 |
+| v8 | 39/50 (78%) | 11/15 | 15/15 | 5/10 | 3/5 | 5/5 | 2/425 |
+| v9 (la actual) | 43/50 (86%) | 14/15 | 15/15 | 5/10 | 4/5 | 5/5 | 0/652 |
+
+La mejora principal es que `buscar_entidad` ahora arma la gobernación o alcaldía completa, con las dependencias registradas con otro nombre, y deja por fuera las entidades autónomas (contralorías, ESE) que tienen el lugar en el nombre. También se agregaron filtros estrictos para "superior a" y búsqueda con todas las palabras en el objeto. Los 7 fallos que quedan y el detalle de cada cambio están en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md#después-de-la-evaluación-v8-y-v9-no-son-medición-a-ciegas).
 
 ```bash
 uv run python evals/run.py --validar                                   # revisa las consultas, sin gastar LLM

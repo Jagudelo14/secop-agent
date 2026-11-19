@@ -122,6 +122,26 @@ def test_varias_entidades_y_nombre_que_empieza():
     where = schema.construir_where({"codigo_entidad": ["700221021", "712170091"]})
     assert "codigo_entidad in (700221021, 712170091)" in where
     where = schema.construir_where({"nombre_entidad_empieza": "Distrito Especial"})
-    assert "upper(nombre_entidad) like 'DISTRITO ESPECIAL%'" in where
+    # espacio como comodín, por nombres con espacios dobles
+    assert "upper(nombre_entidad) like 'DISTRITO%ESPECIAL%'" in where
     with pytest.raises(ValueError):
         schema.validar_filtros({"nombre_entidad_empieza": "abc"})
+
+
+def test_limites_estrictos():
+    where = schema.construir_where({"valor_mayor_que": 1_000_000_000, "duracion_mayor_que_dias": 183})
+    assert "valor_del_contrato > 1000000000" in where
+    assert "fecha_de_inicio_del_contrato) > 183" in where
+
+
+def test_objeto_con_todas_las_palabras():
+    where = schema.construir_where({"objeto_contiene_todas": ["mantenimiento", "via"]})
+    assert where.count(" AND (upper(objeto_del_contrato) like") == 2
+
+
+def test_nombre_entidad_contiene():
+    where = schema.construir_where({"nombre_entidad_contiene": ["alcald", "municipio"]})
+    assert "upper(nombre_entidad) like '%ALCALD%'" in where and "'%MUNICIPIO%'" in where
+    # alcaldía sola también trae municipio
+    where = schema.construir_where({"nombre_entidad_contiene": ["ALCALDIA"]})
+    assert "'%MUNICIPIO%'" in where
