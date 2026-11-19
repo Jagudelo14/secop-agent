@@ -154,3 +154,9 @@ def test_entidades_autonomas_no_son_dependencias():
     assert not tools._es_de_lugar("EMPRESA SOCIAL DEL ESTADO DEL MUNICIPIO DE VILLAVICENCIO", alcaldia, ["VILLAVICENCIO"])
     assert not tools._es_de_lugar("ASOCIACION DE MUNICIPIOS DEL CENTRO DEL DEPARTAMENTO DEL TOLIMA", gobernacion, ["TOLIMA"])
     assert not tools._es_de_lugar("SINDICATO DE TRABAJADORES DE CLINICAS Y HOSPITALES DEL DEPARTAMENTO DEL VALLE", gobernacion, ["VALLE", "CAUCA"])
+
+
+def test_resultado_largo_se_recorta_para_el_modelo(monkeypatch):
+    monkeypatch.setitem(tools.FUNCIONES, "detalle_contrato", lambda **_: {"texto": "x" * 500})
+    texto = tools.ejecutar_como_texto("detalle_contrato", {}, max_caracteres=100)
+    assert len(texto) < 200 and texto.endswith("[recortado: pide menos filas o usa agregar]")

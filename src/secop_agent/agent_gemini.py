@@ -4,7 +4,6 @@
 # Fecha: 2026-11-16
 # Descripción: Bucle del agente con Gemini (nivel gratuito), mismas herramientas y misma salida que agent.py
 
-import json
 import os
 import time
 
@@ -16,19 +15,18 @@ from google.genai import errors
 from secop_agent import tools
 from secop_agent.agent import (
     AVISO_SIN_RESPALDO,
-    MAX_CARACTERES_RESULTADO,
     MAX_LLAMADAS,
-    PROMPT_SISTEMA,
     cifras_sin_respaldo,
+    prompt_sistema,
     urls_en,
 )
 
 load_dotenv()
 
 # ### Configuración ###
-MODELO_GEMINI = "gemini-3.8-flash"
+MODELO_GEMINI = "gemini-3.5-flash-lite"
 # si el principal está saturado
-MODELOS_RESPALDO = "gemini-3.5-flash,gemini-3.5-flash-lite"
+MODELOS_RESPALDO = "gemini-3.1-flash-lite"
 # nivel gratuito, ajustable
 RPM_DEFECTO = 5
 MAX_REINTENTOS = 3
@@ -79,7 +77,7 @@ def _declaraciones():
 
 def _pedir_respuesta(cliente, modelo, contenidos, permitir_herramientas=True):
     configuracion = {
-        "system_instruction": PROMPT_SISTEMA,
+        "system_instruction": prompt_sistema(),
         "tools": [{"function_declarations": _declaraciones()}],
         # bucle manual, no automático
         "automatic_function_calling": {"disable": True},
@@ -120,12 +118,7 @@ def _pedir_respuesta(cliente, modelo, contenidos, permitir_herramientas=True):
 def _correr_herramienta(llamada):
     argumentos = dict(llamada.args or {})
     try:
-        resultado = tools.ejecutar(llamada.name, argumentos)
-        texto = json.dumps(resultado, ensure_ascii=False, default=str)
-        # resultado demasiado largo
-        if len(texto) > MAX_CARACTERES_RESULTADO:
-            texto = texto[:MAX_CARACTERES_RESULTADO] + '... [recortado: pide menos filas o usa agregar]'
-        return {"resultado": texto}, None
+        return {"resultado": tools.ejecutar_como_texto(llamada.name, argumentos)}, None
     # red caída o tiempo agotado incluidos
     except (ValueError, TypeError, OSError, httpx.HTTPError) as error:
         return {"error": str(error)}, str(error)

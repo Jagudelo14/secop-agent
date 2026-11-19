@@ -13,7 +13,7 @@
 [![Demo en línea](https://img.shields.io/badge/demo-en_l%C3%ADnea-FF4B4B?logo=streamlit&logoColor=white)](https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app)
 ![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)
 ![MCP](https://img.shields.io/badge/servidor-MCP-6B4FBB)
-![Pruebas](https://img.shields.io/badge/pruebas-85_sin_red-2EA44F)
+[![Pruebas](https://github.com/Jagudelo14/secop-agent/actions/workflows/pruebas.yml/badge.svg)](https://github.com/Jagudelo14/secop-agent/actions/workflows/pruebas.yml)
 
 **[▶ Probar la demo](https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app)** · [Cómo se evaluó](docs/evaluacion-definitiva.md) · [Arquitectura](#arquitectura)
 
@@ -52,7 +52,7 @@ El 74% es el número oficial. El 86% se logró mirando los fallos de ese mismo s
 | Análisis | **pandas** para las señales de alerta |
 | Integración | Servidor **MCP** (SDK oficial `mcp`) con las mismas 5 herramientas del agente |
 | Interfaz | **Streamlit** en Community Cloud, con límite de preguntas y cédulas ocultas |
-| Calidad | **pytest** (85 pruebas sin red) y un *harness* de evaluación propio con calificación automática y manual |
+| Calidad | **pytest** (88 pruebas sin red, en GitHub Actions en cada push) y un *harness* de evaluación propio con calificación automática y manual |
 | Entorno | Python 3.12 y **uv** |
 
 ## Arranque en cinco minutos
@@ -124,7 +124,7 @@ Hay dos sets, y no cumplen el mismo papel:
 - **Desarrollo (30 preguntas)**, en [evals/preguntas.jsonl](evals/preguntas.jsonl): sirvió para mejorar el prompt de v1 a v7. Último resultado: **28/30**. Como se ajustó el agente mirando estas respuestas, el número es optimista. La historia está en [docs/prompt-versiones.md](docs/prompt-versiones.md).
 - **Definitivo (50 preguntas)**, en [evals/preguntas_definitivas.jsonl](evals/preguntas_definitivas.jsonl): lo escribí yo y lo congelé con su huella SHA-256 antes de que el agente lo viera. Congelé el agente v7 y respondió una sola vez. Las preguntas que no tuvieron respuesta por caídas de Gemini o de datos.gov.co se repitieron, y se dice cuáles. El protocolo completo y cada decisión están en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md).
 
-Las respuestas correctas son consultas SoQL escritas a mano y se recalculan al calificar, porque SECOP cambia todos los días. Conteo, ranking y filtro se califican automáticamente. Las ambiguas y las fuera de alcance se califican a mano, con la razón escrita en [evals/resultados/20261118-085949-manual.json](evals/resultados/20261118-085949-manual.json).
+Las respuestas correctas son consultas SoQL escritas a mano y se recalculan al calificar, porque SECOP cambia todos los días. Conteo, ranking y filtro se califican automáticamente. Las ambiguas y las fuera de alcance se califican a mano, con la razón escrita en [evals/resultados/oficiales/20261118-085949-manual.json](evals/resultados/oficiales/20261118-085949-manual.json).
 
 ### Resultado final (corrida `20261118-085949`, Gemini 3.5 Flash-Lite)
 
@@ -232,7 +232,7 @@ secop-agent/
 ├── evals/preguntas.jsonl             # set de desarrollo (30)
 ├── evals/preguntas_definitivas.jsonl # set definitivo (50)
 ├── evals/run.py
-├── evals/resultados/                 # corridas, métricas y calificación manual
+├── evals/resultados/oficiales/       # corridas evaluadas, métricas y calificación manual
 ├── tests/                # sin red, con respuestas grabadas
 └── docs/                 # esquema, versiones del prompt y evaluación definitiva
 ```

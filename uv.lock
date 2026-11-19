@@ -1562,18 +1562,18 @@ dev = [
 
 [package.metadata]
 requires-dist = [
-    { name = "anthropic", specifier = ">=1.0" },
-    { name = "google-genai", specifier = ">=3.3.0" },
-    { name = "httpx", specifier = ">=0.27" },
-    { name = "mcp", specifier = ">=2.0" },
-    { name = "pandas", specifier = ">=2.2" },
-    { name = "python-dotenv", specifier = ">=1.0" },
-    { name = "streamlit", marker = "extra == 'demo'", specifier = ">=1.40" },
+    { name = "anthropic", specifier = ">=1.0,<3" },
+    { name = "google-genai", specifier = ">=3.3.0,<4" },
+    { name = "httpx", specifier = ">=0.27,<1" },
+    { name = "mcp", specifier = ">=2.0,<3" },
+    { name = "pandas", specifier = ">=2.2,<4" },
+    { name = "python-dotenv", specifier = ">=1.0,<2" },
+    { name = "streamlit", marker = "extra == 'demo'", specifier = ">=1.40,<2" },
 ]
 provides-extras = ["demo"]
 
 [package.metadata.requires-dev]
-dev = [{ name = "pytest", specifier = ">=8.3" }]
+dev = [{ name = "pytest", specifier = ">=8.3,<10" }]
 
 [[package]]
 name = "sniffio"

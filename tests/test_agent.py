@@ -4,6 +4,7 @@
 # Fecha: 2026-11-16
 # Descripción: Pruebas del bucle del agente con un cliente falso, sin gastar API
 
+from datetime import date, datetime, timedelta
 from types import SimpleNamespace as NS
 
 from secop_agent import agent, tools
@@ -84,3 +85,14 @@ def test_sonnet_usa_fallback_del_servidor(monkeypatch):
 def test_costo_haiku():
     uso = {"entrada": 1_000_000, "salida": 1_000_000, "cache_escritura": 0, "cache_lectura": 0}
     assert agent.calcular_costo("claude-haiku-5-5", uso) == 0.60
+
+
+def test_prompt_usa_la_fecha_de_colombia_al_preguntar(monkeypatch):
+    # la fecha se arma en cada pregunta, no al importar
+    monkeypatch.setattr(agent, "hoy_colombia", lambda: date(2030, 1, 2))
+    assert "Hoy es 2030-01-02." in agent.prompt_sistema()
+
+
+def test_hoy_colombia_va_cinco_horas_detras_de_utc():
+    ahora = datetime.now(agent.ZONA_COLOMBIA)
+    assert ahora.utcoffset() == timedelta(hours=-5)

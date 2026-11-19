@@ -8,7 +8,6 @@ import logging
 import os
 import sys
 import threading
-from datetime import date
 from pathlib import Path
 
 import streamlit as st
@@ -27,7 +26,7 @@ except Exception:  # en local no hay secrets.toml
 # cédulas ocultas en la demo
 os.environ["SECOP_OCULTAR_DOCUMENTOS"] = "1"
 
-from secop_agent.agent import responder  # noqa: E402
+from secop_agent.agent import hoy_colombia, responder  # noqa: E402
 
 # ### Configuración ###
 MAX_PREGUNTAS_SESION = 5
@@ -49,18 +48,26 @@ st.set_page_config(page_title="Analista SECOP II", layout="wide")
 @st.cache_resource
 def contador_diario():
     # compartido por todas las sesiones mientras la app esté encendida
-    return {"fecha": date.today(), "usadas": 0, "candado": threading.Lock()}
+    return {"fecha": hoy_colombia(), "usadas": 0, "candado": threading.Lock()}
 
 
 def reservar_pregunta_del_dia():
     contador = contador_diario()
     with contador["candado"]:
-        if contador["fecha"] != date.today():
-            contador["fecha"], contador["usadas"] = date.today(), 0
+        # el día cambia a medianoche de Colombia, no de UTC
+        if contador["fecha"] != hoy_colombia():
+            contador["fecha"], contador["usadas"] = hoy_colombia(), 0
         if contador["usadas"] >= MAX_PREGUNTAS_DIA:
             return False
         contador["usadas"] += 1
         return True
+
+
+def devolver_pregunta_del_dia():
+    # una pregunta que falló no gasta cupo
+    contador = contador_diario()
+    with contador["candado"]:
+        contador["usadas"] = max(contador["usadas"] - 1, 0)
 
 
 # ### Estados ###
@@ -136,6 +143,7 @@ if pregunta:
                 )
             except Exception:  # detalle al log, mensaje simple al visitante
                 logging.getLogger("demo").exception("Falló la pregunta: %s", pregunta)
+                devolver_pregunta_del_dia()
                 st.error("No pude responder en este momento: el modelo o datos.gov.co no respondieron. Intenta de nuevo en un minuto.")
                 st.stop()
 

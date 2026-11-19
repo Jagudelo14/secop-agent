@@ -43,7 +43,7 @@ def test_corre_herramienta_y_responde(monkeypatch):
     llamada = NS(id="f1", name="consultar_contratos", args={"filtros": {"anio": 2024}})
     vistos = _preparar(monkeypatch, [_respuesta(llamadas=[llamada]), _respuesta(texto="Son 3 contratos.")])
 
-    r = agent_gemini.responder("¿cuántos?", modelo="gemini-3.8-flash")
+    r = agent_gemini.responder("¿cuántos?", modelo="gemini-3.5-flash-lite")
 
     assert r["respuesta"] == "Son 3 contratos."
     assert r["llamadas_herramientas"] == 1
@@ -60,7 +60,7 @@ def test_error_de_herramienta_vuelve_al_modelo(monkeypatch):
     llamada = NS(id="f1", name="agregar", args={})
     vistos = _preparar(monkeypatch, [_respuesta(llamadas=[llamada]), _respuesta(texto="No pude.")])
 
-    r = agent_gemini.responder("x", modelo="gemini-3.8-flash")
+    r = agent_gemini.responder("x", modelo="gemini-3.5-flash-lite")
 
     assert r["traza"][0]["error"] == "filtro malo"
     assert vistos[1]["contents"][-1]["parts"][0]["function_response"]["response"] == {"error": "filtro malo"}
@@ -72,7 +72,7 @@ def test_cierra_sin_herramientas_al_limite(monkeypatch):
     respuestas = [_respuesta(llamadas=[llamada]) for _ in range(agent.MAX_LLAMADAS)] + [_respuesta(texto="fin")]
     vistos = _preparar(monkeypatch, respuestas)
 
-    r = agent_gemini.responder("x", modelo="gemini-3.8-flash")
+    r = agent_gemini.responder("x", modelo="gemini-3.5-flash-lite")
 
     assert r["llamadas_herramientas"] == agent.MAX_LLAMADAS
     assert vistos[-1]["config"]["tool_config"]["function_calling_config"]["mode"] == "NONE"

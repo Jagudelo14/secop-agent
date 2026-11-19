@@ -149,7 +149,7 @@ Se cumplió el criterio de parada:
 
 **Registro al cierre del 2026-11-18:**
 
-- **Corrida:** `evals/resultados/20261118-085949.jsonl`, con el agente v7 congelado (commit `v0.5.1`).
+- **Corrida:** `evals/resultados/oficiales/20261118-085949.jsonl`, con el agente v7 congelado (commit `v0.5.1`).
 - **Pasada inicial:** 50 preguntas. Copia en `20261118-085949-pasada1.jsonl`.
 - **Sin respuesta de Gemini:** P12, P21, P24, P28, P31, P34, P37 y P50.
   - Reintento 1: respondieron P12, P21, P24, P28, P37 y P50.
@@ -164,13 +164,13 @@ Se cumplió el criterio de parada:
 1. Repetir P44:
 
 ```
-.venv/Scripts/python.exe -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl --continuar evals/resultados/20261118-085949.jsonl --sin-verificar
+.venv/Scripts/python.exe -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl --continuar evals/resultados/oficiales/20261118-085949.jsonl --sin-verificar
 ```
 
 2. Verificar las 50 una sola vez:
 
 ```
-.venv/Scripts/python.exe -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl --verificar evals/resultados/20261118-085949.jsonl
+.venv/Scripts/python.exe -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl --verificar evals/resultados/oficiales/20261118-085949.jsonl
 ```
 
 3. Calificar a mano P41 a P50 en `20261118-085949-manual.json`, con la razón de cada una, y volver a verificar.
@@ -219,7 +219,7 @@ Las consultas están en `evals/respuestas_definitivas.py`, que las escribe en el
 
 ## Resultados
 
-Corrida `20261118-085949`, agente v7 congelado (commit `v0.5.1`), verificada el 2026-11-19 contra datos.gov.co en vivo. Detalle por pregunta en `evals/resultados/20261118-085949-metricas.md` y respuestas completas en `20261118-085949-respuestas.md`.
+Corrida `20261118-085949`, agente v7 congelado (commit `v0.5.1`), verificada el 2026-11-19 contra datos.gov.co en vivo. Detalle por pregunta en `evals/resultados/oficiales/20261118-085949-metricas.md` y respuestas completas en `20261118-085949-respuestas.md`.
 
 **Acierto: 37/50 (74%).**
 
@@ -309,7 +309,7 @@ Las preguntas fuera de alcance (5/5) y los enlaces (0 inventados de 453) muestra
 
 ### Calificación manual (P41–P50)
 
-Las razones completas están en `evals/resultados/20261118-085949-manual.json`. Resumen:
+Las razones completas están en `evals/resultados/oficiales/20261118-085949-manual.json`. Resumen:
 
 | Pregunta | Resultado | Razón resumida |
 | --- | --- | --- |

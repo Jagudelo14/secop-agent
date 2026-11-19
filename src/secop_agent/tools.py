@@ -4,6 +4,7 @@
 # Fecha: 2026-11-16
 # Descripción: Herramientas que usan el agente y el servidor MCP sobre SECOP II
 
+import json
 import re
 
 from secop_agent import alerts, socrata
@@ -11,9 +12,9 @@ from secop_agent.schema import (
     COLUMNAS_CONTRATO,
     MODALIDADES,
     TIPOS_CONTRATO,
+    a_numero,
     construir_where,
     enmascarar_documento,
-    a_numero,
     limpiar_contrato,
     normalizar_texto,
     para_mostrar,
@@ -22,6 +23,8 @@ from secop_agent.schema import (
 )
 
 MAX_CONTRATOS_POR_ALERTA = 20
+# tope de texto que recibe el modelo por herramienta
+MAX_CARACTERES_RESULTADO = 60_000
 
 AGRUPACIONES = {
     "proveedor": {"clave": "documento_proveedor", "nombre": "proveedor_adjudicado"},
@@ -290,21 +293,7 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
         columnas.append("max(tipodocproveedor) as tipo_documento")
     columnas += COLUMNAS_METRICAS
 
-    # sin ubicación no es un lugar
-    where_grupos = where
-    sin_ubicacion = None
-    if agrupar_por in ("ciudad", "departamento"):
-        where_grupos = f"{where} AND {grupo['clave']} != 'No Definido'"
-        fila = socrata.consultar({
-            "$select": "count(*) as num_contratos, sum(valor_del_contrato) as total_valor",
-            "$where": f"{where} AND {grupo['clave']} = 'No Definido'",
-        })
-        fila = fila[0] if fila else {}
-        sin_ubicacion = {
-            "num_contratos": int(a_numero(fila.get("num_contratos"))),
-            "total_valor": a_numero(fila.get("total_valor")),
-            "nota": f"Contratos sin {agrupar_por} registrada en SECOP ('No Definido'); no entran al ranking",
-        }
+    where_grupos, sin_ubicacion = _separar_sin_ubicacion(where, agrupar_por, grupo["clave"])
 
     # ranking agrupado en servidor
     filas = socrata.consultar({
@@ -327,16 +316,7 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
         if agrupar_por == "proveedor":
             # ocultar cédula si aplica
             clave = enmascarar_documento(clave, f.get("tipo_documento"))
-        grupos.append({
-            "clave": clave,
-            "nombre": f.get("nombre"),
-            "num_contratos": int(a_numero(f.get("num_contratos"))),
-            "total_valor": a_numero(f.get("total_valor")),
-            "total_pagado": a_numero(f.get("total_pagado")),
-            "promedio_valor": round(a_numero(f.get("promedio_valor")), 2),
-            "contratistas_distintos": int(a_numero(f.get("contratistas_distintos"))),
-            "_clave_real": f.get("clave"),
-        })
+        grupos.append({"clave": clave, "nombre": f.get("nombre"), **_resumen_metricas(f), "_clave_real": f.get("clave")})
 
     if incluir_enlaces and grupos:
         if agrupar_por in ("proveedor", "entidad"):
@@ -349,20 +329,41 @@ def agregar(filtros, agrupar_por, metrica="suma_valor", top=10, incluir_enlaces=
         # quitar clave interna
         g.pop("_clave_real", None)
 
-    totales = general[0] if general else {}
     return {
         "agrupado_por": agrupar_por,
         "metrica": metrica,
-        "total_general": {
-            "num_contratos": int(a_numero(totales.get("num_contratos"))),
-            "total_valor": a_numero(totales.get("total_valor")),
-            "total_pagado": a_numero(totales.get("total_pagado")),
-            "promedio_valor": round(a_numero(totales.get("promedio_valor")), 2),
-            "contratistas_distintos": int(a_numero(totales.get("contratistas_distintos"))),
-        },
+        "total_general": _resumen_metricas(general[0] if general else {}),
         "grupos": grupos,
         "sin_ubicacion": sin_ubicacion,
     }
+
+
+def _resumen_metricas(fila):
+    # métricas de una fila agrupada, en números
+    return {
+        "num_contratos": int(a_numero(fila.get("num_contratos"))),
+        "total_valor": a_numero(fila.get("total_valor")),
+        "total_pagado": a_numero(fila.get("total_pagado")),
+        "promedio_valor": round(a_numero(fila.get("promedio_valor")), 2),
+        "contratistas_distintos": int(a_numero(fila.get("contratistas_distintos"))),
+    }
+
+
+def _separar_sin_ubicacion(where, agrupar_por, columna):
+    # "No Definido" no es un lugar: sale del ranking y se reporta aparte
+    if agrupar_por not in ("ciudad", "departamento"):
+        return where, None
+    fila = socrata.consultar({
+        "$select": "count(*) as num_contratos, sum(valor_del_contrato) as total_valor",
+        "$where": f"{where} AND {columna} = 'No Definido'",
+    })
+    fila = fila[0] if fila else {}
+    sin_ubicacion = {
+        "num_contratos": int(a_numero(fila.get("num_contratos"))),
+        "total_valor": a_numero(fila.get("total_valor")),
+        "nota": f"Contratos sin {agrupar_por} registrada en SECOP ('No Definido'); no entran al ranking",
+    }
+    return f"{where} AND {columna} != 'No Definido'", sin_ubicacion
 
 
 def _agregar_enlaces(grupos, where, columna_clave, por_grupo=3):
@@ -581,3 +582,11 @@ def ejecutar(nombre, argumentos):
     if nombre not in FUNCIONES:
         raise ValueError(f"Herramienta desconocida: {nombre}")
     return FUNCIONES[nombre](**argumentos)
+
+
+def ejecutar_como_texto(nombre, argumentos, max_caracteres=MAX_CARACTERES_RESULTADO):
+    # lo que recibe el modelo, igual para claude y gemini
+    texto = json.dumps(ejecutar(nombre, argumentos), ensure_ascii=False, default=str)
+    if len(texto) > max_caracteres:
+        texto = texto[:max_caracteres] + "... [recortado: pide menos filas o usa agregar]"
+    return texto

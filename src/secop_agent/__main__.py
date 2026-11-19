@@ -13,7 +13,7 @@ from secop_agent.agent import responder
 def main():
     parser = argparse.ArgumentParser(description="Pregúntale a SECOP II en lenguaje natural")
     parser.add_argument("pregunta", help="Pregunta entre comillas")
-    parser.add_argument("--modelo", default=None, help="claude-sonnet-5-5, claude-haiku-5-5 o gemini-3.8-flash")
+    parser.add_argument("--modelo", default=None, help="claude-sonnet-5-5, claude-haiku-5-5 o gemini-3.5-flash-lite")
     parser.add_argument("--traza", action="store_true", help="Mostrar llamadas a herramientas")
     args = parser.parse_args()
 

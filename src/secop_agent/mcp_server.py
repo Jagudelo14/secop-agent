@@ -49,6 +49,7 @@ def detalle_contrato(id_contrato: str) -> dict:
 # ### Esquemas ###
 # mismo esquema que ve el agente; sin esto filtros sale vacío
 for herramienta in tools.HERRAMIENTAS:
+    # API interna del SDK; pyproject fija mcp<3 para que no cambie sin aviso
     servidor._tool_manager.get_tool(herramienta["name"]).parameters = herramienta["input_schema"]
 
 

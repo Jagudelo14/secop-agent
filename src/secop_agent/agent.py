@@ -4,11 +4,10 @@
 # Fecha: 2026-11-16
 # Descripción: Bucle del agente con tool use nativo del SDK anthropic, sin frameworks
 
-import json
 import os
 import re
 import time
-from datetime import date
+from datetime import datetime, timedelta, timezone
 
 import anthropic
 import httpx
@@ -22,7 +21,6 @@ load_dotenv()
 MODELO_DEFECTO = "claude-sonnet-5-5"
 MAX_LLAMADAS = 8
 MAX_TOKENS = 16000
-MAX_CARACTERES_RESULTADO = 60_000
 
 # USD por millón de tokens
 PRECIOS = {
@@ -36,7 +34,7 @@ MODELOS_CON_FALLBACK = {"claude-sonnet-5-5"}
 # historial en docs/prompt-versiones.md
 VERSION_PROMPT = "v9"
 
-PROMPT_SISTEMA = f"""Eres un analista de contratación pública colombiana. Respondes preguntas sobre contratos de SECOP II (conjunto jbjy-vk9h de datos.gov.co) usando solo las herramientas disponibles. Hoy es {date.today().isoformat()}.
+PLANTILLA_PROMPT = """Eres un analista de contratación pública colombiana. Respondes preguntas sobre contratos de SECOP II (conjunto jbjy-vk9h de datos.gov.co) usando solo las herramientas disponibles. Hoy es {hoy}.
 
 Reglas:
 - Toda cifra que des (montos, conteos, porcentajes) tiene que venir de un resultado de herramienta en esta conversación. Si una herramienta falla o no devuelve datos, dilo y no estimes.
@@ -61,6 +59,18 @@ Reglas:
 - Si la pregunta pide algo que estos datos no contienen o que no se puede verificar con ellos, dilo y no respondas de memoria.
 - Responde en español, breve y directo."""
 
+# colombia no tiene horario de verano
+ZONA_COLOMBIA = timezone(timedelta(hours=-5), "America/Bogota")
+
+
+def hoy_colombia():
+    return datetime.now(ZONA_COLOMBIA).date()
+
+
+def prompt_sistema():
+    # se arma en cada pregunta: el proceso puede durar días y el servidor está en UTC
+    return PLANTILLA_PROMPT.replace("{hoy}", hoy_colombia().isoformat())
+
 
 # ### Cliente ###
 def crear_cliente(api_key=None):
@@ -75,7 +85,7 @@ def _pedir_respuesta(cliente, modelo, mensajes, permitir_herramientas=True):
     parametros = {
         "model": modelo,
         "max_tokens": MAX_TOKENS,
-        "system": [{"type": "text", "text": PROMPT_SISTEMA, "cache_control": {"type": "ephemeral"}}],
+        "system": [{"type": "text", "text": prompt_sistema(), "cache_control": {"type": "ephemeral"}}],
         "tools": herramientas,
         "tool_choice": {"type": "auto"} if permitir_herramientas else {"type": "none"},
         "output_config": {"effort": os.getenv("EFFORT", "medium")},
@@ -135,11 +145,7 @@ def urls_en(texto):
 
 def _correr_herramienta(bloque):
     try:
-        resultado = tools.ejecutar(bloque.name, dict(bloque.input))
-        texto = json.dumps(resultado, ensure_ascii=False, default=str)
-        # resultado demasiado largo
-        if len(texto) > MAX_CARACTERES_RESULTADO:
-            texto = texto[:MAX_CARACTERES_RESULTADO] + '... [recortado: pide menos filas o usa agregar]'
+        texto = tools.ejecutar_como_texto(bloque.name, dict(bloque.input))
         return {"type": "tool_result", "tool_use_id": bloque.id, "content": texto}, None
     # red caída o tiempo agotado incluidos
     except (ValueError, TypeError, OSError, httpx.HTTPError) as error:

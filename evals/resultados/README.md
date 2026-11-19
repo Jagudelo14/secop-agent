@@ -8,7 +8,7 @@
 
 # Resultados de la evaluación
 
-Aquí dejo las corridas del set definitivo de 50 preguntas, con todo lo necesario para auditarlas. Las corridas del set de desarrollo no se versionan. El protocolo y el análisis están en [docs/evaluacion-definitiva.md](../../docs/evaluacion-definitiva.md).
+En `oficiales/` dejo las corridas del set definitivo de 50 preguntas, con todo lo necesario para auditarlas. Las corridas nuevas que hace `evals/run.py` quedan en esta carpeta y git las ignora; si quiero conservar una, la muevo a `oficiales/`. Las corridas del set de desarrollo no se versionan. El protocolo y el análisis están en [docs/evaluacion-definitiva.md](../../docs/evaluacion-definitiva.md).
 
 ## Corridas
 
@@ -46,7 +46,7 @@ Las cédulas de personas naturales están enmascaradas (`***123`), igual que en 
 Para recalificar una corrida con los datos de hoy:
 
 ```bash
-uv run python evals/run.py --preguntas evals/preguntas_definitivas.jsonl --verificar evals/resultados/20261118-085949.jsonl
+uv run python evals/run.py --preguntas evals/preguntas_definitivas.jsonl --verificar evals/resultados/oficiales/20261118-085949.jsonl
 ```
 
 Ojo: el comando sobrescribe los archivos `-verificado.jsonl`, `-metricas.md` y `-respuestas.md` de esa corrida, y como SECOP cambia todos los días, puede dar cifras un poco distintas a las de la fecha original. Para conservar los archivos de la evaluación, recalifica sobre una copia del `.jsonl`.
