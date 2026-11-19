@@ -8,27 +8,58 @@
 
 # Agente analista de contratación pública (SECOP II)
 
-Un agente en Python que responde preguntas en lenguaje natural sobre contratos públicos colombianos y marca patrones que vale la pena revisar. Cada cifra que entrega trae el enlace al contrato del que salió.
+**Pregúntale en español a los contratos públicos de Colombia y recibe cifras verificables: cada número trae el enlace al contrato del que salió.**
 
-> *¿Qué contratistas recibieron más dinero por contratación directa de la Secretaría General de la Alcaldía Mayor de Bogotá en 2025?*
-> → tabla con el top, total en pesos, número de contratos y enlace a SECOP de cada uno.
+[![Demo en línea](https://img.shields.io/badge/demo-en_l%C3%ADnea-FF4B4B?logo=streamlit&logoColor=white)](https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app)
+![Python 3.12](https://img.shields.io/badge/python-3.12-3776AB?logo=python&logoColor=white)
+![MCP](https://img.shields.io/badge/servidor-MCP-6B4FBB)
+![Pruebas](https://img.shields.io/badge/pruebas-85_sin_red-2EA44F)
+
+**[▶ Probar la demo](https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app)** · [Cómo se evaluó](docs/evaluacion-definitiva.md) · [Arquitectura](#arquitectura)
 
 ![Demo: pregunta en la app, tabla con el top 10 y el contrato abierto en SECOP](docs/demo.gif)
 
-*Demo en línea, en tiempo real y sin cortes: la respuesta tardó 4,7 s y el enlace abre el contrato en SECOP. Según la consulta, una respuesta puede tardar de unos segundos a más de un minuto, sobre todo por datos.gov.co.*
+*En tiempo real y sin cortes: la respuesta tardó 4,7 s y el enlace abre el contrato en SECOP. Según la consulta, puede tardar de unos segundos a más de un minuto, sobre todo por datos.gov.co.*
 
-Qué muestra este repo:
+## Resultados
 
-1. **Un agente con herramientas sobre una API real con datos sucios.** El bucle de *tool use* está escrito a mano con el SDK `anthropic`, sin LangChain ([agent.py](src/secop_agent/agent.py)).
-2. **Un servidor MCP propio** que expone las mismas herramientas ([mcp_server.py](src/secop_agent/mcp_server.py)).
-3. **Calidad medida** con un set de desarrollo de 30 preguntas y una evaluación final de 50 que el agente vio una sola vez, con respuestas correctas recalculadas en vivo ([evals/](evals/), [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md)). **Resultado a ciegas: 37/50 (74%), 0 enlaces inventados de 453.** Después de corregir los fallos encontrados: 43/50 (86%).
-4. **Se corre en cinco minutos**, o se prueba en la [demo en línea](https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app).
+Lo evalué con **50 preguntas diferentes a las del desarrollo**, con las respuestas correctas recalculadas en vivo contra datos.gov.co.
+
+| | Resultado |
+| --- | --- |
+| Acierto a ciegas (agente v7) | **74%** (37/50) |
+| Acierto después de corregir los fallos encontrados (v9) | **86%** (43/50) |
+| Enlaces inventados | **0** de 652 en la v9 (0 de 453 en la v7) |
+| Preguntas fuera de alcance que declinó en vez de inventar | **5/5** |
+| Costo por pregunta | USD 0 con Gemini gratis · ~USD 0,004 con Claude Haiku |
+
+El 74% es el número oficial. El 86% se logró mirando los fallos de ese mismo set, así que se reporta aparte ([detalle](#evaluación)).
+
+## Qué hace
+
+- **Responde en lenguaje natural** conteos, sumas, rankings y listados, filtrando por entidad, año, modalidad, tipo de contrato, valor, duración, lugar o palabras del objeto.
+- **Entiende datos sucios de verdad.** Una misma gobernación aparece en SECOP con decenas de nombres ("DEPARTAMENTO DE…", "GOBERNACIÓN…", con doble espacio). El agente la arma completa con sus dependencias, deja por fuera contralorías y ESE, y avisa cuando hay municipios homónimos.
+- **Marca patrones para revisar** con 4 reglas deterministas: posible fraccionamiento, concentración en contratación directa, fechas inconsistentes y valores atípicos. Siempre con el aviso *"patrón para revisar, no implica irregularidad"*.
+- **No inventa.** Las cifras las calcula el código, no el modelo. Si la respuesta trae un número que no salió de una herramienta, el agente la corrige, y si la pregunta pide algo que SECOP no tiene (calidad de obras, sanciones), lo dice.
+- **Se usa de tres formas:** demo web, línea de comandos y servidor MCP para Claude Code o Claude Desktop.
+
+## Stack técnico
+
+| Capa | Tecnología |
+| --- | --- |
+| Agente | Bucle de *tool use* escrito a mano, sin LangChain. Funciona con **Claude** (SDK `anthropic`) o **Gemini** (`google-genai`) cambiando una variable |
+| Datos | API **Socrata/SoQL** de datos.gov.co (SECOP II): agregaciones en el servidor, paginación, reintentos y caché en disco |
+| Análisis | **pandas** para las señales de alerta |
+| Integración | Servidor **MCP** (SDK oficial `mcp`) con las mismas 5 herramientas del agente |
+| Interfaz | **Streamlit** en Community Cloud, con límite de preguntas y cédulas ocultas |
+| Calidad | **pytest** (85 pruebas sin red) y un *harness* de evaluación propio con calificación automática y manual |
+| Entorno | Python 3.12 y **uv** |
 
 ## Arranque en cinco minutos
 
 ```bash
 pip install uv
-git clone <repo> && cd secop-agent
+git clone https://github.com/Jagudelo14/secop-agent.git && cd secop-agent
 uv sync --extra demo
 cp .env.example .env        # gratis: PROVEEDOR=gemini y GEMINI_API_KEY; o PROVEEDOR=anthropic y ANTHROPIC_API_KEY
 
@@ -47,10 +78,10 @@ flowchart LR
     MCP["mcp_server.py<br/>Claude Code o Desktop"] --> T
     T["tools.py<br/>5 herramientas"] --> AL["alerts.py<br/>4 señales en pandas"]
     T --> SC["socrata.py<br/>paginación, reintentos, caché"]
-    SC --> API[("datos.gov.co<br/>jbjy-vk9h")]
+    SC --> API[("datos.gov.co")]
 ```
 
-Claude solo decide qué consultar y redacta la respuesta. Los montos, rankings y alertas los calcula el código, y `tools.py` es la única fuente de herramientas: el agente y el MCP importan las mismas funciones y las mismas descripciones.
+El agente solo decide qué consultar y redacta la respuesta. Los montos, rankings y alertas los calcula el código, y `tools.py` es la única fuente de herramientas: el agente y el MCP importan las mismas funciones y las mismas descripciones.
 
 | Herramienta | Qué hace |
 | --- | --- |
@@ -64,14 +95,16 @@ Los filtros son los mismos en todas: entidad (una, varias, por inicio o por part
 
 ## Lo que salió del esquema real (fase 0)
 
-`scripts/fase0_esquema.py` baja los metadatos y 1.000 filas y genera [docs/schema.json](docs/schema.json) y [docs/esquema.md](docs/esquema.md). Todas las columnas esperadas existen. Lo que cambió el diseño:
+Antes de escribir una sola herramienta, revisé cómo es de verdad el conjunto de SECOP II en datos.gov.co. `scripts/fase0_esquema.py` baja los metadatos y una muestra de 1.000 contratos y genera [docs/schema.json](docs/schema.json) y [docs/esquema.md](docs/esquema.md). El conjunto tiene 95 columnas; el agente usa 20. Lo que encontré y cómo cambió el diseño:
 
-- **El NIT no identifica una entidad.** Las secretarías de Bogotá comparten el NIT del Distrito, y el mismo NIT aparece con y sin dígito de verificación (`899999061` y `8999990619`). Se filtra y agrupa por `codigo_entidad`.
-- `urlproceso` llega como objeto `{"url": ...}`, no como texto.
-- Los montos son `number` en Socrata (se suman en el servidor) pero llegan como texto en el JSON.
-- Hay contratos sin `fecha_de_firma`; ordenar por fecha `DESC` los pone primero.
-- Comparar con comodines para ignorar tildes mezcla lugares ("Cauca" atrapaba "Chocó"). Departamentos y ciudades se resuelven contra la lista real de valores y se filtran con `=`.
-- `tipo_de_contrato` y `modalidad_de_contratacion` son listas cerradas y se validan como `enum`.
+- **El NIT no identifica una entidad.** Las secretarías de Bogotá comparten el NIT del Distrito, y el mismo NIT aparece con y sin dígito de verificación (`899999061` y `8999990619`). Si se filtra por NIT, se mezclan entidades distintas. Por eso todo se filtra y agrupa por `codigo_entidad`, que sí es único, y `buscar_entidad` existe para traducir un nombre a ese código.
+- **Los montos llegan como texto, pero en el servidor son números.** En el JSON `valor_del_contrato` viene como `"10007333"`, mientras que Socrata lo guarda como `number`. Eso permite sumar, contar y agrupar en el servidor con `$group` en vez de bajar miles de filas: un ranking de toda una entidad es una sola consulta.
+- **El enlace al contrato viene anidado.** `urlproceso` llega como objeto `{"url": ...}`, no como texto. Es el enlace que acompaña cada cifra, así que se extrae siempre de ahí y el modelo nunca lo escribe.
+- **Faltan datos en columnas clave.** El 0,5% de los contratos no tiene `fecha_de_firma`: quedan por fuera de cualquier filtro por año, porque el año sale de esa fecha, y al ordenar por fecha `DESC` sin filtro de año salen primero. El 21% no tiene `ciudad` ("No Definido"), y en los rankings por ubicación ese grupo se reporta aparte en vez de aparecer como si fuera un municipio.
+- **Hay contratos que no cuentan.** Los estados "Borrador" y "Cancelado" no son contratos firmados, así que todas las consultas los excluyen.
+- **Ignorar tildes con comodines mezcla lugares.** Para que "Bogota" encontrara "Bogotá" se usaban comodines en las vocales, pero "Cauca" terminaba atrapando "Chocó". Los departamentos y ciudades se resuelven contra la lista real de valores y se filtran con `=`.
+- **Algunas columnas son listas cerradas.** `tipo_de_contrato` y `modalidad_de_contratacion` tienen un conjunto fijo de valores, así que se validan como `enum` y el modelo no puede inventar una modalidad que no existe.
+- **Hay datos personales.** `documento_proveedor` trae la cédula de las personas naturales. La demo pública la oculta.
 
 ## Señales de alerta
 
@@ -89,7 +122,7 @@ Cuatro reglas deterministas en pandas ([alerts.py](src/secop_agent/alerts.py)). 
 Hay dos sets, y no cumplen el mismo papel:
 
 - **Desarrollo (30 preguntas)**, en [evals/preguntas.jsonl](evals/preguntas.jsonl): sirvió para mejorar el prompt de v1 a v7. Último resultado: **28/30**. Como se ajustó el agente mirando estas respuestas, el número es optimista. La historia está en [docs/prompt-versiones.md](docs/prompt-versiones.md).
-- **Definitivo (50 preguntas)**, en [evals/preguntas_definitivas.jsonl](evals/preguntas_definitivas.jsonl): escrito por otra persona y congelado con su huella SHA-256 antes de que el agente lo viera. El agente v7 se congeló y respondió una sola vez. Las preguntas que no tuvieron respuesta por caídas de Gemini o de datos.gov.co se repitieron, y se dice cuáles. El protocolo completo y cada decisión están en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md).
+- **Definitivo (50 preguntas)**, en [evals/preguntas_definitivas.jsonl](evals/preguntas_definitivas.jsonl): lo escribí yo y lo congelé con su huella SHA-256 antes de que el agente lo viera. Congelé el agente v7 y respondió una sola vez. Las preguntas que no tuvieron respuesta por caídas de Gemini o de datos.gov.co se repitieron, y se dice cuáles. El protocolo completo y cada decisión están en [docs/evaluacion-definitiva.md](docs/evaluacion-definitiva.md).
 
 Las respuestas correctas son consultas SoQL escritas a mano y se recalculan al calificar, porque SECOP cambia todos los días. Conteo, ranking y filtro se califican automáticamente. Las ambiguas y las fuera de alcance se califican a mano, con la razón escrita en [evals/resultados/20261118-085949-manual.json](evals/resultados/20261118-085949-manual.json).
 

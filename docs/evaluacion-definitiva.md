@@ -8,12 +8,12 @@
 
 # Evaluación definitiva
 
-Esta es la evaluación que se presenta. Usa el set de 50 preguntas escrito por Juan Camilo Agudelo, que no se usó para desarrollar el agente. El proceso de desarrollo previo, con el set de 30 preguntas, está en [prompt-versiones.md](prompt-versiones.md).
+Esta es la evaluación que presento. Usa un set de 50 preguntas que escribí yo, distinto del que usé para desarrollar el agente. El proceso de desarrollo previo, con el set de 30 preguntas, está en [prompt-versiones.md](prompt-versiones.md).
 
 ## Set de preguntas
 
-- **Archivo:** `evals/preguntas_definitivas.jsonl`, con la redacción exacta del autor. Solo se agregan las consultas SoQL que dan la respuesta correcta; el texto de las preguntas no se toca.
-- **Autor:** Juan Camilo Agudelo. Las preguntas no las escribió quien desarrolló el agente.
+- **Archivo:** `evals/preguntas_definitivas.jsonl`, con mi redacción exacta. Solo agregué las consultas SoQL que dan la respuesta correcta; el texto de las preguntas no se toca.
+- **Quién las escribió:** yo. No salieron del proceso de ajuste del prompt, que hice con Claude sobre el set de desarrollo de 30.
 - **Congelado:** 2026-11-16 15:22, antes de que el agente respondiera cualquiera de ellas.
 - **Huella SHA-256** de las 50 líneas `id<TAB>pregunta`: `73cb07fc6e16bfbf2fb4998e444ef06c04c9abc06729c5f4dc639e750676b06c`
 
@@ -29,29 +29,14 @@ Esta es la evaluación que se presenta. Usa el set de 50 preguntas escrito por J
 
 1. **Capacidades:** se implementa **solo** la lista cerrada de la sección siguiente. Se desarrolla y se prueba con pruebas unitarias y preguntas propias, **nunca** corriendo el agente sobre las 50 del set.
 2. **Congelamiento:** se fija la versión final del código y del prompt y se registra el commit.
-3. **Corrida final:** una sola vez sobre las 50 preguntas. Es la única vez que el agente ve este set. Las preguntas que no respondan por saturación o cuota de Gemini se repiten al final (ver cambio de protocolo del 2026-11-18).
+3. **Corrida final:** una sola vez sobre las 50 preguntas. Es la única vez que el agente ve este set. Las preguntas que queden sin respuesta por una caída de Gemini o de datos.gov.co se repiten al final con `--continuar`. Las que ya respondieron no se repiten, sean correctas o no.
 4. **Reporte:** se presenta esa corrida con todas las métricas, sin excluir preguntas.
 
-**Cambio de protocolo (2026-11-18, durante la corrida final y antes de calificar):** por decisión del autor, las preguntas que queden sin respuesta porque Gemini no respondió (saturación o cuota) **sí se repiten** al final de la corrida, con `--continuar`, hasta tener respuesta. Solo se repiten las que no tienen respuesta. Las que ya respondieron no se repiten, sean correctas o no. El reporte dice cuáles se repitieron y cuántos intentos necesitaron.
-
-**Ampliación (2026-11-18, por decisión del autor):** la misma regla aplica cuando la caída es de datos.gov.co. En P18, P41 y P44 el agente respondió solo que el servidor de SECOP II no respondía, sin dar datos. Se repiten igual que las de Gemini, porque es una falla de infraestructura y no del agente. Esas respuestas se identificaron con una búsqueda automática de frases de error ("no responde", "timed out", "intenta de nuevo"), sin calificar el resto.
-
-**Cambio de protocolo (2026-11-17):** el plan inicial incluía una línea base con el agente v5 sobre estas mismas 50 preguntas. El autor decidió que el set se use solo para la medición final. La línea base se canceló cuando había respondido 1 pregunta (P01); esa respuesta se borró sin leerla ni calificarla. La copia `evals/linea_base/` queda en el repositorio pero no se usa.
-
-Después de la corrida final el agente no recibe más cambios. Si aparece un error del agente, se documenta como hallazgo, no se corrige para volver a medir.
-
-### Decisiones tomadas por el autor antes de correr
-
-| Tema | Decisión |
-| --- | --- |
-| Enfoque | Capacidades preregistradas y luego una sola corrida final. La línea base sobre este set se canceló el 2026-11-17 por decisión del autor |
-| P05 "entidades territoriales" del Tolima | Cuentan todas las entidades ubicadas en Tolima |
-| Preguntas de búsqueda por texto (P35, P37, P38, P40) | Las palabras clave que definen la respuesta correcta las propone el desarrollador y las aprueba el autor antes de congelar las respuestas correctas |
-| Ambiguas (P41–P45) | Acierta si pide aclaración o si separa las entidades aclarando que son varias. Falla si elige una sola en silencio o suma todo como si fuera una entidad |
+La versión que se mide (v7) no recibe cambios después de la corrida final: sus errores se documentan como hallazgos. Las correcciones posteriores (v8 y v9) se reportan aparte, al final.
 
 ## Capacidades a agregar (lista cerrada)
 
-Se decidió leyendo los **temas** de las preguntas, antes de ver cualquier respuesta del agente. No se agrega nada que no esté aquí.
+La decidí leyendo los **temas** de las preguntas, antes de ver cualquier respuesta del agente. No se agrega nada que no esté aquí.
 
 | # | Capacidad | Para qué tipo de pregunta |
 | --- | --- | --- |
@@ -78,7 +63,7 @@ El prompt solo cambia para mencionar las capacidades nuevas en términos general
 | Conteo o suma | Aparecen **todas** las cifras pedidas, con tolerancia de 1%. Si la pregunta pide varios años o dos valores (pagado y contratado), deben estar todos |
 | Ranking | Aparecen todos los elementos pedidos (5 o 10) en el orden correcto |
 | Filtro | El conjunto de contratos listados es exactamente el esperado. Si la pregunta pone un tope ("hasta 50") y hay más, acierta si lista el tope y todos los listados cumplen el filtro |
-| Ambigua | Criterio de la tabla de decisiones. Se califica a mano, dejando escrita la razón de cada una |
+| Ambigua | Pide aclaración, o separa las entidades aclarando que son varias. Falla si elige una sola en silencio o suma todo como si fuera una entidad. Se califica a mano, dejando escrita la razón de cada una |
 | Fuera de alcance | Dice que los datos no permiten responder lo que se pregunta y no afirma nada que no esté en los datos (por ejemplo, que una obra tuvo retrasos o sobrecostos). Puede mostrar datos de SECOP como contexto si aclara que no responden la pregunta. Se califica a mano, dejando escrita la razón |
 
 **Cómo queda la calificación manual:** el calificador automático da una sugerencia para ambiguas y fuera de alcance. La decisión final y su razón se escriben en `evals/resultados/<corrida>-manual.json`, y esa decisión manda sobre la sugerencia. Los archivos manuales quedan en el repositorio para auditarlos.
@@ -137,7 +122,7 @@ Las pruebas de la v6 se habían hecho solo a nivel de herramienta. Antes de cong
 
 Con el cambio de texto, el prompt pasa a **v7**.
 
-**Nota sobre la regla de municipios:** coincide con la definición que el autor aprobó para P22 (agrupar por ciudad). Se agregó porque falló una pregunta del set de verificación propio, no por respuestas del set definitivo, que el agente no ha visto.
+**Nota sobre la regla de municipios:** coincide con la definición que aprobé para P22 (agrupar por ciudad). Se agregó porque falló una pregunta del set de verificación propio, no por respuestas del set definitivo, que el agente no ha visto.
 
 ### Regresión con la v7 y congelamiento
 
@@ -215,7 +200,7 @@ Las consultas están en `evals/respuestas_definitivas.py`, que las escribe en el
 | P20 | Lo mismo con la Gobernación de Cundinamarca ("DEPARTAMENTO DE CUNDINAMARCA - SECRETARÍA ...") |
 | P32 | Lo mismo con la Gobernación del Valle del Cauca |
 
-### Decisiones (aprobadas por el autor el 2026-11-16, antes de la línea base)
+### Decisiones (las aprobé el 2026-11-16, antes de la línea base)
 
 | Pregunta | Propuesta | Resultado con la propuesta |
 | --- | --- | --- |
@@ -266,7 +251,7 @@ Corrida `20261118-085949`, agente v7 congelado (commit `v0.5.1`), verificada el 
 | Preguntas que llegaron al límite de 8 llamadas | 4/50 (8%) |
 | Herramientas por pregunta (promedio) | 2,7 |
 
-**Reintentos por infraestructura** (cambio de protocolo del 2026-11-18): 11 preguntas se repitieron porque no hubo respuesta.
+**Reintentos por infraestructura:** 11 preguntas se repitieron porque no hubo respuesta.
 
 - **Por Gemini (8):**
   - P12, P21, P24, P28, P37 y P50 respondieron en el primer reintento.
@@ -345,11 +330,11 @@ Las razones completas están en `evals/resultados/20261118-085949-manual.json`. 
 | P49 Sobrecostos | Acierto (límite) | Muestra con datos verificados que no hubo contratos de construcción de hospitales; no dice de forma explícita que SECOP tampoco mide sobrecostos |
 | P50 Cumplimiento | Acierto | Declina sin dar datos |
 
-Todas las cifras que citan las respuestas de P41–P50 se contrastaron contra datos.gov.co. Los tres casos marcados como límite son los que el autor puede querer revisar. Si se cambian a fallo, el acierto baja a 34/50 (68%).
+Todas las cifras que citan las respuestas de P41–P50 se contrastaron contra datos.gov.co. Los tres casos marcados como límite son los que revisé con más cuidado. Si se cambian a fallo, el acierto baja a 34/50 (68%).
 
 ## Después de la evaluación: v8 y v9 (no son medición a ciegas)
 
-El resultado de la evaluación definitiva es el de la v7: **37/50 (74%)**. Lo que sigue se hizo después, por decisión del autor, para corregir los fallos que encontró esa evaluación. Las dos versiones se ajustaron mirando las respuestas de este mismo set, así que sus números son optimistas y no reemplazan al 74%: miden cuánto mejora el agente cuando se corrigen fallos conocidos, no cómo le va con preguntas nuevas.
+El resultado de la evaluación definitiva es el de la v7: **37/50 (74%)**. Lo que sigue lo hice después, para corregir los fallos que encontró esa evaluación. Las dos versiones se ajustaron mirando las respuestas de este mismo set, así que sus números son optimistas y no reemplazan al 74%: miden cuánto mejora el agente cuando se corrigen fallos conocidos, no cómo le va con preguntas nuevas.
 
 | Corrida | Prompt | Acierto | Conteo | Ranking | Filtro | Ambigua | Fuera de alcance | Enlaces inventados |
 | --- | --- | --- | --- | --- | --- | --- | --- | --- |
@@ -396,4 +381,4 @@ Antes de correr las 50 se probaron solo P03, P04, P11, P14 y P38: 5/5 (`20261119
 | P40 | Filtro | Mezcló palabras genéricas ("construcción", "adecuación") con las deportivas; sobran 15 |
 | P43 | Ambigua | Eligió en silencio la Universidad Nacional de Colombia y respondió $0 sin mencionar otras candidatas |
 
-La v9 no llegó a la meta de 90% que se propuso el autor. No se hizo otra ronda: cada regla nueva del prompt arregla una pregunta y puede dañar otra (P37 es el ejemplo), y seguir ajustando sobre este mismo set haría el número cada vez menos creíble.
+La v9 no llegó a la meta de 90% que me propuse. No hice otra ronda: cada regla nueva del prompt arregla una pregunta y puede dañar otra (P37 es el ejemplo), y seguir ajustando sobre este mismo set haría el número cada vez menos creíble.

@@ -165,7 +165,7 @@ Comparación honesta: la v3 sacó 30/30 con ejemplos del set en el prompt, y la 
 
 La v6 agrega las capacidades C1 a C8 (rangos de años, búsqueda en el objeto, agrupar por ciudad y sector, promedio, contratistas distintos, tipo de persona, duración, varias entidades y robustez ante errores de red). Se decidieron leyendo los temas del set definitivo de 50 preguntas, antes de correr el agente sobre él. El detalle, el protocolo y los resultados están en [evaluacion-definitiva.md](evaluacion-definitiva.md).
 
-Antes de los cambios se guardó una copia exacta de la v5 en `evals/linea_base/` para correr la línea base. Esa línea base se canceló después por decisión del autor.
+Antes de los cambios se guardó una copia exacta de la v5 en `evals/linea_base/` para correr la línea base. Después decidí cancelar esa línea base.
 
 ## Iteración 7 — v7, verificación con el agente completo
 
@@ -188,7 +188,7 @@ Con eso se cumplió el criterio de parada y **la v7 quedó congelada** para la e
 
 ## Iteraciones 8 y 9 — después de la evaluación definitiva
 
-Después de la evaluación definitiva (v7, 37/50), el autor decidió corregir los fallos encontrados. La v8 y la v9 se ajustaron mirando las respuestas del set de 50, así que sus resultados no son a ciegas:
+Después de la evaluación definitiva (v7, 37/50), decidí corregir los fallos encontrados. La v8 y la v9 se ajustaron mirando las respuestas del set de 50, así que sus resultados no son a ciegas:
 
 | Corrida | Prompt | Set | Resultado | Enlaces inventados |
 | --- | --- | --- | --- | --- |
@@ -203,7 +203,7 @@ Qué cambió en cada una y por qué está en [evaluacion-definitiva.md](evaluaci
 - **Archivo:** `evals/preguntas_prueba.jsonl`, 10 preguntas: 3 de conteo o suma, 3 de ranking, 2 de filtro y 2 fuera de alcance.
 - **Entidades:** Departamento de Santander, Municipio de Bucaramanga, Agencia Nacional de Infraestructura, SENA Regional Córdoba e ICBF Regional Bolívar. Ninguna aparece en el set de desarrollo.
 - **Congelado:** 2026-11-16 15:10, antes de correr la v5. SHA-256 del archivo: `6721936f9fea36ccf284ef7e1e1819c35ce62372cde16304d0a92a0e8c3c19bc`. Si el archivo cambia, la huella cambia.
-- **Quién lo escribió:** Claude, el mismo asistente que ajustó el prompt, aunque antes de ver cualquier resultado de la v5 y sin que el prompt se haya ajustado a estas preguntas. Para una evaluación más independiente, conviene que otra persona escriba un set adicional.
+- **Quién lo escribió:** lo generé con Claude, el mismo asistente con el que ajusté el prompt, antes de ver cualquier resultado de la v5 y sin ajustar el prompt a estas preguntas. Como no es independiente, el set definitivo de 50 lo escribí yo.
 - **Validación:** las consultas SoQL se ejecutaron con `--validar` antes de congelar. h05 se reescribió en ese momento porque pedía "las 5 primeras" modalidades y la entidad solo usó 3.
 
 ## Correcciones al calificador
