@@ -163,7 +163,12 @@ Se cumplió el criterio de parada:
 
 ### Corrida final
 
-**Estado al cierre del 2026-11-18 (en curso, sin calificar):**
+**Estado final (2026-11-19): corrida completa, verificada y calificada.** Los resultados están en la sección [Resultados](#resultados). Lo que sigue es el registro de cómo se llegó ahí.
+
+- **2026-11-19:** P44 se repitió con el mismo agente congelado (el código de `src/` no cambió desde `v0.5.1`). Respondió en 818 s con 8 herramientas. La primera llamada volvió a agotar el tiempo de datos.gov.co, pero el agente siguió con otras consultas. Copia del estado previo en `20261118-085949-antes-p44.jsonl` y registro en `definitiva-reintento-p44.log`.
+- **2026-11-19:** verificación de las 50 (`definitiva-verificacion.log`), con la calificación manual de P41–P50 en `20261118-085949-manual.json`. Los archivos `-verificado.jsonl`, `-metricas.md` y `-respuestas.md` quedan reemplazados por esta verificación y son el resultado final.
+
+**Registro al cierre del 2026-11-18:**
 
 - **Corrida:** `evals/resultados/20261118-085949.jsonl`, con el agente v7 congelado (commit `v0.5.1`).
 - **Pasada inicial:** 50 preguntas. Copia en `20261118-085949-pasada1.jsonl`.
@@ -235,4 +240,109 @@ Las consultas están en `evals/respuestas_definitivas.py`, que las escribe en el
 
 ## Resultados
 
-Pendiente.
+Corrida `20261118-085949`, agente v7 congelado (commit `v0.5.1`), verificada el 2026-11-19 contra datos.gov.co en vivo. Detalle por pregunta en `evals/resultados/20261118-085949-metricas.md` y respuestas completas en `20261118-085949-respuestas.md`.
+
+**Acierto: 37/50 (74%).**
+
+### Acierto por tipo
+
+| Tipo | Acierto | Calificación |
+| --- | --- | --- |
+| Conteo o suma | 13/15 (86,7%) | Automática |
+| Ranking | 12/15 (80,0%) | Automática |
+| Filtro | 3/10 (30,0%) | Automática |
+| Ambigua | 4/5 (80,0%) | Manual |
+| Fuera de alcance | 5/5 (100%) | Manual |
+| **Total** | **37/50 (74,0%)** | |
+
+### Confiabilidad
+
+| Métrica | Valor |
+| --- | --- |
+| Errores del agente (no respondió) | 0/50 |
+| Enlaces inventados (no vienen de ninguna herramienta) | **0/453 (0%)** |
+| Respuestas con datos que incluyen enlace | 36/40 (90%) |
+| Llamadas a herramientas con error | 1/136 (0,7%), el tiempo agotado en P44 |
+| Preguntas que llegaron al límite de 8 llamadas | 4/50 (8%) |
+| Herramientas por pregunta (promedio) | 2,7 |
+
+**Reintentos por infraestructura** (cambio de protocolo del 2026-11-18): 11 preguntas se repitieron porque no hubo respuesta.
+
+- **Por Gemini (8):**
+  - P12, P21, P24, P28, P37 y P50 respondieron en el primer reintento.
+  - P31 y P34 respondieron en el tercero.
+- **Por datos.gov.co (3):**
+  - P18 y P41 respondieron en el primer reintento.
+  - P44 respondió el 2026-11-19, después de un reintento que se detuvo sin terminar.
+
+Ninguna respuesta que ya existiera se repitió.
+
+### Latencia, tokens y costo
+
+| Métrica | Valor |
+| --- | --- |
+| Latencia promedio / mediana / p95 | 135,5 s / 87,0 s / 342,5 s |
+| Latencia más alta | 818 s (P44) |
+| Tokens totales | 1.675.747 de entrada · 64.790 de salida |
+| Tokens por pregunta (promedio) | 33.515 de entrada · 1.296 de salida |
+| Modelos que respondieron | gemini-3.5-flash-lite: 35 · gemini-3.1-flash-lite (respaldo): 15 |
+| Costo real | USD 0 (cuota gratuita de Gemini) |
+| Costo estimado con los mismos tokens, sin caché | claude-haiku-5-5: USD 0,20 (USD 4,00 por 1.000 preguntas) · claude-sonnet-5-5: USD 4,00 (USD 79,99 por 1.000 preguntas) |
+
+La latencia la domina datos.gov.co, no el modelo. Algunas llamadas a `buscar_entidad` tardaron más de 200 s. Las ambiguas son las más lentas (337 s en promedio, 6 herramientas) porque el agente busca varias entidades candidatas.
+
+| Tipo | Tokens entrada prom. | Tokens salida prom. | Latencia prom. (s) | Herramientas prom. |
+| --- | --- | --- | --- | --- |
+| Conteo o suma | 20.380 | 855 | 142,7 | 2,5 |
+| Ranking | 23.430 | 1.266 | 103,5 | 1,7 |
+| Filtro | 49.838 | 2.682 | 113,0 | 3,1 |
+| Ambigua | 65.556 | 632 | 337,1 | 6,0 |
+| Fuera de alcance | 38.487 | 600 | 53,2 | 2,4 |
+
+### Errores (13)
+
+Según el protocolo, los errores se documentan como hallazgos y el agente no se corrige.
+
+| Pregunta | Tipo | Qué pasó |
+| --- | --- | --- |
+| P08 | Conteo | Dio 10.515 contratistas distintos; la respuesta correcta es 11.155. Filtró por "SANTIAGO DE CALI DISTRITO ESPECIAL", pero la Secretaría de Cultura está registrada con doble espacio ("SANTIAGO DE CALI  DISTRITO ESPECIAL - ...", 2.615 contratos en 2023–2024) y el filtro por inicio de nombre no la toma |
+| P14 | Conteo | Dio 2.441; la respuesta correcta es 2.268. `duracion_min_dias` incluye el límite (≥ 183) y la pregunta dice "superior a seis meses" (> 183). Hay exactamente 173 contratos de 183 días: 2.441 − 173 = 2.268. El agente debió pasar 184 |
+| P20 | Ranking | Filtró por nombres que empiezan con "GOBERNACION DE CUNDINAMARCA", pero la entidad está registrada como "DEPARTAMENTO DE CUNDINAMARCA - ...". El top 10 es de otra entidad |
+| P23 | Ranking | La misma causa de P08: el filtro no toma la Secretaría de Cultura (registrada con doble espacio). Por eso faltan la Corporación de Eventos y el Fondo Mixto de Cultura, que contratan con esa secretaría, y el valor del primero no coincide |
+| P24 | Ranking | Listó los 10 contratos de mayor valor resumiendo su objeto, en vez de agrupar por el texto del objeto como se decidió para P24 |
+| P31 | Filtro | El total (104) es correcto, pero listó los contratos con enlaces "Ver contrato" sin el id `CO1.PCCNTR`, así que el calificador no pudo comprobarlos. **Posible falso negativo del calificador**; se mantiene la nota automática |
+| P32 | Filtro | Dio 76 contratos; la respuesta correcta es 138. Filtró por "GOBERNACION DEL VALLE DEL CAUCA", pero muchas dependencias están registradas con otros nombres: "DEPARTAMENTO DEL VALLE DEL CAUCA - ...", "GOBERNACION DEL VALLE - ..." (sin "del Cauca") o con la gobernación al final ("SECRETARIA DE INFRAESTRUCTURA - GOBERNACION DEL VALLE") |
+| P33 | Filtro | Juntó los dos "Municipio de Armenia" (Quindío y Antioquia) sin avisar; sobran 4 contratos |
+| P34 | Filtro | Encontró la Gobernación del Tolima ("GOBIERNO DEPARTAMENTAL"), pero dio 68 en vez de 67. Es el mismo caso de P14: `valor_min` incluye el límite (≥) y la pregunta dice "superiores a 1.000 millones" (>). Hay exactamente 1 contrato de $1.000.000.000. Además listó solo 10 de los 67 |
+| P35 | Filtro | Agregó "tecnologico" a las palabras clave aprobadas: 807 contratos en vez de 756, y 11 de los 50 listados no cumplen el filtro |
+| P37 | Filtro | Usó palabras clave distintas a las aprobadas ("mantenimiento de vias", "vias"): faltan 25 y sobran 9 |
+| P38 | Filtro | Restringió a tipo "Suministros" y no filtró por alcaldías: faltan 45 de 48 |
+| P44 | Ambigua | Ver la calificación manual: un ranking de 3 subredes de Bogotá que solo cuenta contratos con "salud" en el objeto, sin decirlo |
+
+**Patrones:**
+
+1. **Filtros por texto (P35, P37, P38):** el agente elige sus propias palabras clave y no coinciden con las aprobadas. Son 3 de los 7 fallos de filtro.
+2. **Resolución de entidades (P08, P20, P23, P32, P33):** el filtro por inicio de nombre depende de cómo esté registrada la entidad: un doble espacio, otro prefijo o dos entidades con el mismo nombre cambian el resultado sin que el agente lo note. Es la causa más frecuente: 5 fallos.
+3. **Límite incluido o excluido (P14, P34):** `duracion_min_dias` y `valor_min` incluyen el límite y el agente no lo ajusta cuando la pregunta dice "superior a". En las dos preguntas la diferencia es exactamente la de los contratos que caen en el límite.
+4. **Formato (P24, P31):** la respuesta tiene los datos, pero no en la forma que se pidió o que el calificador puede leer.
+
+Las preguntas fuera de alcance (5/5) y los enlaces (0 inventados de 453) muestran que el agente no inventa: cuando falla, falla en cómo arma la consulta, no en afirmar cosas que no están en los datos.
+
+### Calificación manual (P41–P50)
+
+Las razones completas están en `evals/resultados/20261118-085949-manual.json`. Resumen:
+
+| Pregunta | Resultado | Razón resumida |
+| --- | --- | --- |
+| P41 Policía | Acierto | Aclara que son varias unidades; da el agregado de las 17 entidades "POLICIA…" diciendo que es un agregado y ofrece consultar una |
+| P42 Fiscalía | Acierto | Aclara que hay varias regionales (son 9); da solo el Nivel Central, lo dice y ofrece las demás |
+| P43 Universidad Nacional | Acierto (límite) | Separa la Universidad Nacional ($0) de la Pedagógica Nacional sin sumarlas; no pide aclaración explícita |
+| P44 Hospitales públicos | **Fallo** | Resuelve la ambigüedad con un criterio que no explica (solo contratos con "salud") y presenta 3 subredes como los hospitales que más contrataron |
+| P45 Ministerio de Transporte | Acierto (límite) | Es una sola entidad en SECOP; deja explícito que "principales" es por valor. Cifras verificadas |
+| P46 Calidad de obras | Acierto | Declina primero; muestra contratistas solo como contexto |
+| P47 Retrasos | Acierto | Declina; los estados "Suspendido" que muestra son reales y advierte que no implican irregularidad |
+| P48 Sanciones | Acierto | Declina sin dar datos |
+| P49 Sobrecostos | Acierto (límite) | Muestra con datos verificados que no hubo contratos de construcción de hospitales; no dice de forma explícita que SECOP tampoco mide sobrecostos |
+| P50 Cumplimiento | Acierto | Declina sin dar datos |
+
+Todas las cifras que citan las respuestas de P41–P50 se contrastaron contra datos.gov.co. Los tres casos marcados como límite son los que el autor puede querer revisar. Si se cambian a fallo, el acierto baja a 34/50 (68%).

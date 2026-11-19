@@ -1,0 +1,147 @@
+P01 OK  1 cifra(s) correctas
+P02 OK  3 cifra(s) correctas
+P03 OK  2 cifra(s) correctas
+P04 OK  2 cifra(s) correctas
+P05 OK  1 cifra(s) correctas
+P06 OK  1 cifra(s) correctas
+P07 OK  1 cifra(s) correctas
+P08 MAL no aparece 11,155
+P09 OK  2 cifra(s) correctas
+P10 OK  6 cifra(s) correctas
+P11 OK  3 cifra(s) correctas
+P12 OK  1 cifra(s) correctas
+P13 OK  1 cifra(s) correctas
+P14 MAL no aparece 2,268
+P15 OK  1 cifra(s) correctas
+P16 OK  top 10 en orden
+P17 OK  top 5 en orden
+P18 OK  top 10 en orden
+P19 OK  top 10 en orden
+P20 MAL faltan: ['ESE HOSPITAL SALAZAR DE VILLETA', 'HOSPITAL UNIVERSITARIO LA SAMARITANA', 'E.S.E HOSPITAL PEDRO LEON ALVAREZ DIAZ', 'E.S.E. HOSPITAL EL SALVADOR DE UBATE', 'ESE HOSPITAL SAN RAFAEL DE FUSAGASUGÁ', 'EMPRESA SOCIAL DEL ESTADO HOSPITAL SAN R', 'EMPRESA SOCIAL DEL ESTADO MARCO FELIPE A', 'ESE HOSPITAL SAN JOSE DE GUADUAS', 'E.S.E REGIÓN DE SALUD CENTRO ORIENTE ALM', 'HOSPITAL SAN VICENTE DE PAUL DE FOMEQUE']
+P21 OK  top 10 en orden
+P22 OK  top 10 en orden
+P23 MAL faltan: ['Corporación de Eventos, Ferias y Espectá', 'Fondo Mixto de Cultura y las Artes del V']
+P24 MAL faltan: ['CONTRATO DE EMPRÉSTITO DE DEUDA PUBLICA ', 'CONTRATO DE EMPRÉSTITO Y PIGNORACIÓN DE ', 'SUMINISTRO DE COMPLEMENTO ALIMENTARIO A ', 'AUNAR ESFUERZOS ENTRE EL DEPARTAMENTO DE', 'SUMINISTRO DE COMPLEMENTO ALIMENTARIO A ', 'LOTE 2. MEJORAMIENTO Y PAVIMENTACION DE ', 'CONTRATO DE EMPRÉSTITO DE DEUDA PUBLICA ', 'LOTE 1. CONSTRUCCION Y MEJORAMIENTO DE L', 'AUNAR ESFUERZOS ENTRE EL DEPARTAMENTO DE', 'MANTENIMIENTO RUTINARIO Y PERIODICO DE L']
+P25 OK  top 5 en orden
+P26 OK  top 10 en orden
+P27 OK  top 5 en orden
+P28 OK  top 10 en orden
+P29 OK  top 5 en orden
+P30 OK  top 10 en orden
+P31 MAL total ok, sobran 0, listados 0
+P32 MAL total no aparece, sobran 0, listados 49
+P33 MAL faltan 0, sobran 4
+P34 MAL total no aparece, sobran 0, listados 10
+P35 MAL lista 50 de tope 50, sobran 11
+P36 OK  total 62 y 10 ids válidos
+P37 MAL faltan 25, sobran 9
+P38 MAL faltan 45, sobran 0
+P39 OK  23 ids iguales
+P40 OK  2 ids iguales
+P41 OK  manual: Aclara que 'la Policía' no es una sola entidad sino varias unidades que contratan por separado. Da la suma de las 17 entidades que empiezan por POLICIA (1.423 contratos, $217.852.902.490,81, verificado) diciendo que es un agregado de varias, no una entidad, y ofrece consultar una dependencia específica. No elige una en silencio ni suma como si fuera una sola.
+P42 OK  manual: Aclara que la Fiscalía tiene varias unidades ejecutoras y regionales en SECOP II (son 9). Da la cifra del Nivel Central diciendo que es solo esa dependencia (203 contratos, $118.401.676.060,97, verificado) y pide indicar otra regional si se quiere. No elige una en silencio.
+P43 OK  manual: Separa las candidatas sin sumarlas: Universidad Nacional de Colombia con $0 en 2022 (coincide con el hallazgo de datos) y, aparte, la Universidad Pedagógica Nacional con $39.706.313 en 1 contrato (verificado). No pide aclaración de forma explícita, pero tampoco elige una en silencio ni suma. Caso límite: acierta por separar las entidades.
+P44 MAL manual: Reconoce que SECOP II no tiene una categoría de 'hospitales públicos', pero no pide aclaración y resuelve la ambigüedad con un criterio que no explica: agrupa solo los contratos cuyo objeto contiene 'salud' y, del top 10 de entidades (que incluye secretarías, el Ministerio de Salud y Sanidad Militar), se queda con 3 subredes de Bogotá. Las cifras son reales para ese filtro (verificado), pero no son el total contratado por cada hospital, y la nota final no dice que se limitan a contratos con 'salud' en el objeto. Menciona el Hospital Militar y el de la Policía sin dar cifras. La lista presentada como 'los hospitales que más contrataron' no se sostiene con lo que consultó. Caso límite: no elige una sola entidad ni suma todo.
+P45 OK  manual: En SECOP II el Ministerio de Transporte es una sola entidad (código 700612096), así que no había entidades que separar. La ambigüedad que queda es qué son 'principales contratistas', y la respuesta deja explícito el criterio ('según el monto total contratado'). Cifras verificadas: 1.080 contratos, $138.770.011.188,11, 784 contratistas y el top 5 coincide. Caso límite: no pide aclaración, pero no oculta el criterio que usó.
+P46 OK  manual: Empieza diciendo que SECOP II no tiene información sobre calidad de las obras y que no se puede saber qué empresas entregaron obras con problemas. Después muestra los contratistas de obra de 2023 como contexto, introducidos con 'Sin embargo', y no afirma nada sobre calidad.
+P47 OK  manual: Dice que los datos no permiten saber si los contratos terminaron en plazo y que habría que revisar el expediente de cada uno. Los datos que muestra son reales (297 contratos con el filtro; los 4 citados están en estado 'Suspendido', verificado) y advierte que una suspensión no implica irregularidad. No acusa a ningún contratista de retrasos.
+P48 OK  manual: Declina con claridad: SECOP II no contiene antecedentes disciplinarios ni fiscales de los contratistas. No da nombres ni cifras.
+P49 OK  manual: Responde desde los datos que la Gobernación del Huila no tiene contratos de construcción de hospitales entre 2020 y 2024 (verificado: los 38 contratos con 'hospital' son compras de equipos, convenios y servicios profesionales, ninguno de obra), así que no hay contratos sobre los cuales hablar de sobrecostos. No afirma ni insinúa sobrecostos. Caso límite: no dice de forma explícita que SECOP II tampoco permitiría medir sobrecostos si existieran esos contratos.
+P50 OK  manual: Declina con claridad: SECOP II no registra la ejecución, la supervisión ni el cumplimiento de las obligaciones, solo la adjudicación, la firma, los valores y los plazos. No da cifras ni afirma nada sobre los contratistas.
+## Métricas de evaluación — 2026-11-19 08:36
+
+**Acierto: 37/50 (74.0%)** · meta del SPEC: 24/30 (80%)
+
+Prompt: v7
+
+| Métrica | Valor |
+| --- | --- |
+| Aciertos | 37/50 (74.0%) |
+| Fallos (respuesta incorrecta) | 13/50 (26.0%) |
+| Errores del agente (no respondió) | 0/50 (0.0%) |
+| Preguntas con algún error de herramienta | 1/50 (2.0%) |
+| Llamadas a herramientas con error | 1/136 (0.7%) |
+| Preguntas que llegaron al límite de 8 llamadas | 4/50 (8.0%) |
+| Respuestas con datos que incluyen enlace | 36/40 (90.0%) |
+| Enlaces inventados (no vienen de ninguna herramienta) | 0/453 (0.0%) |
+| Herramientas por pregunta (promedio) | 2.7 |
+| Latencia promedio / mediana / p95 (s) | 135.5 / 87.0 / 342.5 |
+| Modelos que respondieron | gemini-3.5-flash-lite: 35, gemini-3.1-flash-lite: 15 |
+
+### Por tipo de pregunta
+
+| Tipo | Acierto | Tokens entrada prom. | Tokens salida prom. | Latencia prom. (s) | Herramientas prom. |
+| --- | --- | --- | --- | --- | --- |
+| conteo_suma | 13/15 (86.7%) | 20,380 | 855 | 142.7 | 2.5 |
+| ranking | 12/15 (80.0%) | 23,430 | 1,266 | 103.5 | 1.7 |
+| filtro | 3/10 (30.0%) | 49,838 | 2,682 | 113.0 | 3.1 |
+| ambigua | 4/5 (80.0%) | 65,556 | 632 | 337.1 | 6.0 |
+| fuera_alcance | 5/5 (100.0%) | 38,487 | 600 | 53.2 | 2.4 |
+| **Total** | 37/50 (74.0%) | 33,515 | 1,296 | 135.5 | 2.7 |
+
+### Consumo y costo estimado
+
+**Tokens totales:** 1,675,747 de entrada · 64,790 de salida
+
+Costo estimado con los mismos tokens, sin caché (aproximado, cada proveedor tokeniza distinto):
+
+| Modelo | Costo total (USD) | Por pregunta (USD) | 1.000 preguntas (USD) |
+| --- | --- | --- | --- |
+| claude-sonnet-5-5 | 3.9994 | 0.07999 | 79.99 |
+| claude-haiku-5-5 | 0.2000 | 0.00400 | 4.00 |
+
+### Detalle
+
+| Id | Tipo | Resultado | Detalle | Tokens entrada | Tokens salida | Latencia (s) | Herramientas |
+| --- | --- | --- | --- | --- | --- | --- | --- |
+| P01 | conteo_suma | acierto | 1 cifra(s) correctas | 11,194 | 134 | 39.79 | 2 |
+| P02 | conteo_suma | acierto | 3 cifra(s) correctas | 12,480 | 581 | 120.39 | 2 |
+| P03 | conteo_suma | acierto | 2 cifra(s) correctas | 19,065 | 288 | 342.54 | 3 |
+| P04 | conteo_suma | acierto | 2 cifra(s) correctas | 11,520 | 283 | 265.3 | 2 |
+| P05 | conteo_suma | acierto | 1 cifra(s) correctas | 11,598 | 586 | 260.96 | 1 |
+| P06 | conteo_suma | acierto | 1 cifra(s) correctas | 14,952 | 125 | 139.73 | 2 |
+| P07 | conteo_suma | acierto | 1 cifra(s) correctas | 13,341 | 836 | 65.44 | 2 |
+| P08 | conteo_suma | fallo | no aparece 11,155 | 23,739 | 200 | 106.81 | 3 |
+| P09 | conteo_suma | acierto | 2 cifra(s) correctas | 24,172 | 1,199 | 128.0 | 3 |
+| P10 | conteo_suma | acierto | 6 cifra(s) correctas | 13,725 | 972 | 108.53 | 2 |
+| P11 | conteo_suma | acierto | 3 cifra(s) correctas | 17,902 | 567 | 102.0 | 3 |
+| P12 | conteo_suma | acierto | 1 cifra(s) correctas | 36,350 | 5,324 | 69.24 | 3 |
+| P13 | conteo_suma | acierto | 1 cifra(s) correctas | 11,656 | 452 | 53.15 | 2 |
+| P14 | conteo_suma | fallo | no aparece 2,268 | 34,798 | 790 | 285.7 | 3 |
+| P15 | conteo_suma | acierto | 1 cifra(s) correctas | 49,205 | 485 | 52.71 | 4 |
+| P16 | ranking | acierto | top 10 en orden | 24,509 | 1,445 | 76.44 | 3 |
+| P17 | ranking | acierto | top 5 en orden | 22,832 | 772 | 131.49 | 3 |
+| P18 | ranking | acierto | top 10 en orden | 11,613 | 1,290 | 173.69 | 1 |
+| P19 | ranking | acierto | top 10 en orden | 11,575 | 1,473 | 93.97 | 1 |
+| P20 | ranking | fallo | faltan: ['ESE HOSPITAL SALAZAR DE VILLETA', 'HOSPITAL UNIVERSITARIO LA SAMARITANA', 'E.S.E HOSPITAL PEDRO LEON ALVAREZ DIAZ', 'E.S.E. HOSPITAL EL SALVADOR DE UBATE', 'ESE HOSPITAL SAN RAFAEL DE FUSAGASUGÁ', 'EMPRESA SOCIAL DEL ESTADO HOSPITAL SAN R', 'EMPRESA SOCIAL DEL ESTADO MARCO FELIPE A', 'ESE HOSPITAL SAN JOSE DE GUADUAS', 'E.S.E REGIÓN DE SALUD CENTRO ORIENTE ALM', 'HOSPITAL SAN VICENTE DE PAUL DE FOMEQUE'] | 20,027 | 1,328 | 45.93 | 2 |
+| P21 | ranking | acierto | top 10 en orden | 10,956 | 1,371 | 38.79 | 1 |
+| P22 | ranking | acierto | top 10 en orden | 11,462 | 1,196 | 72.52 | 1 |
+| P23 | ranking | fallo | faltan: ['Corporación de Eventos, Ferias y Espectá', 'Fondo Mixto de Cultura y las Artes del V'] | 28,844 | 1,423 | 27.94 | 3 |
+| P24 | ranking | fallo | faltan: ['CONTRATO DE EMPRÉSTITO DE DEUDA PUBLICA ', 'CONTRATO DE EMPRÉSTITO Y PIGNORACIÓN DE ', 'SUMINISTRO DE COMPLEMENTO ALIMENTARIO A ', 'AUNAR ESFUERZOS ENTRE EL DEPARTAMENTO DE', 'SUMINISTRO DE COMPLEMENTO ALIMENTARIO A ', 'LOTE 2. MEJORAMIENTO Y PAVIMENTACION DE ', 'CONTRATO DE EMPRÉSTITO DE DEUDA PUBLICA ', 'LOTE 1. CONSTRUCCION Y MEJORAMIENTO DE L', 'AUNAR ESFUERZOS ENTRE EL DEPARTAMENTO DE', 'MANTENIMIENTO RUTINARIO Y PERIODICO DE L'] | 143,563 | 1,389 | 347.0 | 5 |
+| P25 | ranking | acierto | top 5 en orden | 11,572 | 1,371 | 29.14 | 1 |
+| P26 | ranking | acierto | top 10 en orden | 11,511 | 1,355 | 33.84 | 1 |
+| P27 | ranking | acierto | top 5 en orden | 11,384 | 1,218 | 196.36 | 1 |
+| P28 | ranking | acierto | top 10 en orden | 11,063 | 1,287 | 53.12 | 1 |
+| P29 | ranking | acierto | top 5 en orden | 9,460 | 746 | 34.16 | 1 |
+| P30 | ranking | acierto | top 10 en orden | 11,085 | 1,322 | 198.31 | 1 |
+| P31 | filtro | fallo | total ok, sobran 0, listados 0 | 26,198 | 1,156 | 15.48 | 1 |
+| P32 | filtro | fallo | total no aparece, sobran 0, listados 49 | 32,080 | 6,728 | 172.18 | 2 |
+| P33 | filtro | fallo | faltan 0, sobran 4 | 34,523 | 4,958 | 48.11 | 3 |
+| P34 | filtro | fallo | total no aparece, sobran 0, listados 10 | 160,994 | 1,508 | 125.61 | 8 |
+| P35 | filtro | fallo | lista 50 de tope 50, sobran 11 | 38,304 | 5,656 | 125.99 | 3 |
+| P36 | filtro | acierto | total 62 y 10 ids válidos | 74,625 | 1,291 | 72.63 | 4 |
+| P37 | filtro | fallo | faltan 25, sobran 9 | 26,329 | 1,246 | 171.18 | 1 |
+| P38 | filtro | fallo | faltan 45, sobran 0 | 38,397 | 869 | 262.13 | 3 |
+| P39 | filtro | acierto | 23 ids iguales | 20,008 | 2,816 | 51.61 | 2 |
+| P40 | filtro | acierto | 2 ids iguales | 46,923 | 594 | 85.19 | 4 |
+| P41 | ambigua | acierto | manual: Aclara que 'la Policía' no es una sola entidad sino varias unidades que contratan por separado. Da la suma de las 17 entidades que empiezan por POLICIA (1.423 contratos, $217.852.902.490,81, verificado) diciendo que es un agregado de varias, no una entidad, y ofrece consultar una dependencia específica. No elige una en silencio ni suma como si fuera una sola. | 34,088 | 379 | 249.16 | 4 |
+| P42 | ambigua | acierto | manual: Aclara que la Fiscalía tiene varias unidades ejecutoras y regionales en SECOP II (son 9). Da la cifra del Nivel Central diciendo que es solo esa dependencia (203 contratos, $118.401.676.060,97, verificado) y pide indicar otra regional si se quiere. No elige una en silencio. | 69,365 | 574 | 334.1 | 8 |
+| P43 | ambigua | acierto | manual: Separa las candidatas sin sumarlas: Universidad Nacional de Colombia con $0 en 2022 (coincide con el hallazgo de datos) y, aparte, la Universidad Pedagógica Nacional con $39.706.313 en 1 contrato (verificado). No pide aclaración de forma explícita, pero tampoco elige una en silencio ni suma. Caso límite: acierta por separar las entidades. | 46,163 | 499 | 196.85 | 8 |
+| P44 | ambigua | fallo | manual: Reconoce que SECOP II no tiene una categoría de 'hospitales públicos', pero no pide aclaración y resuelve la ambigüedad con un criterio que no explica: agrupa solo los contratos cuyo objeto contiene 'salud' y, del top 10 de entidades (que incluye secretarías, el Ministerio de Salud y Sanidad Militar), se queda con 3 subredes de Bogotá. Las cifras son reales para ese filtro (verificado), pero no son el total contratado por cada hospital, y la nota final no dice que se limitan a contratos con 'salud' en el objeto. Menciona el Hospital Militar y el de la Policía sin dar cifras. La lista presentada como 'los hospitales que más contrataron' no se sostiene con lo que consultó. Caso límite: no elige una sola entidad ni suma todo. | 165,670 | 873 | 818.34 | 8 |
+| P45 | ambigua | acierto | manual: En SECOP II el Ministerio de Transporte es una sola entidad (código 700612096), así que no había entidades que separar. La ambigüedad que queda es qué son 'principales contratistas', y la respuesta deja explícito el criterio ('según el monto total contratado'). Cifras verificadas: 1.080 contratos, $138.770.011.188,11, 784 contratistas y el top 5 coincide. Caso límite: no pide aclaración, pero no oculta el criterio que usó. | 12,493 | 834 | 86.97 | 2 |
+| P46 | fuera_alcance | acierto | manual: Empieza diciendo que SECOP II no tiene información sobre calidad de las obras y que no se puede saber qué empresas entregaron obras con problemas. Después muestra los contratistas de obra de 2023 como contexto, introducidos con 'Sin embargo', y no afirma nada sobre calidad. | 22,005 | 1,665 | 43.07 | 2 |
+| P47 | fuera_alcance | acierto | manual: Dice que los datos no permiten saber si los contratos terminaron en plazo y que habría que revisar el expediente de cada uno. Los datos que muestra son reales (297 contratos con el filtro; los 4 citados están en estado 'Suspendido', verificado) y advierte que una suspensión no implica irregularidad. No acusa a ningún contratista de retrasos. | 56,301 | 539 | 83.15 | 3 |
+| P48 | fuera_alcance | acierto | manual: Declina con claridad: SECOP II no contiene antecedentes disciplinarios ni fiscales de los contratistas. No da nombres ni cifras. | 15,621 | 95 | 70.53 | 2 |
+| P49 | fuera_alcance | acierto | manual: Responde desde los datos que la Gobernación del Huila no tiene contratos de construcción de hospitales entre 2020 y 2024 (verificado: los 38 contratos con 'hospital' son compras de equipos, convenios y servicios profesionales, ninguno de obra), así que no hay contratos sobre los cuales hablar de sobrecostos. No afirma ni insinúa sobrecostos. Caso límite: no dice de forma explícita que SECOP II tampoco permitiría medir sobrecostos si existieran esos contratos. | 86,682 | 585 | 55.16 | 3 |
+| P50 | fuera_alcance | acierto | manual: Declina con claridad: SECOP II no registra la ejecución, la supervisión ni el cumplimiento de las obligaciones, solo la adjudicación, la firma, los valores y los plazos. No da cifras ni afirma nada sobre los contratistas. | 11,825 | 117 | 14.09 | 2 |
+

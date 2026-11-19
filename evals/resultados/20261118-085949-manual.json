@@ -1,0 +1,42 @@
+{
+  "P41": {
+    "acierto": true,
+    "razon": "Aclara que 'la Policía' no es una sola entidad sino varias unidades que contratan por separado. Da la suma de las 17 entidades que empiezan por POLICIA (1.423 contratos, $217.852.902.490,81, verificado) diciendo que es un agregado de varias, no una entidad, y ofrece consultar una dependencia específica. No elige una en silencio ni suma como si fuera una sola."
+  },
+  "P42": {
+    "acierto": true,
+    "razon": "Aclara que la Fiscalía tiene varias unidades ejecutoras y regionales en SECOP II (son 9). Da la cifra del Nivel Central diciendo que es solo esa dependencia (203 contratos, $118.401.676.060,97, verificado) y pide indicar otra regional si se quiere. No elige una en silencio."
+  },
+  "P43": {
+    "acierto": true,
+    "razon": "Separa las candidatas sin sumarlas: Universidad Nacional de Colombia con $0 en 2022 (coincide con el hallazgo de datos) y, aparte, la Universidad Pedagógica Nacional con $39.706.313 en 1 contrato (verificado). No pide aclaración de forma explícita, pero tampoco elige una en silencio ni suma. Caso límite: acierta por separar las entidades."
+  },
+  "P44": {
+    "acierto": false,
+    "razon": "Reconoce que SECOP II no tiene una categoría de 'hospitales públicos', pero no pide aclaración y resuelve la ambigüedad con un criterio que no explica: agrupa solo los contratos cuyo objeto contiene 'salud' y, del top 10 de entidades (que incluye secretarías, el Ministerio de Salud y Sanidad Militar), se queda con 3 subredes de Bogotá. Las cifras son reales para ese filtro (verificado), pero no son el total contratado por cada hospital, y la nota final no dice que se limitan a contratos con 'salud' en el objeto. Menciona el Hospital Militar y el de la Policía sin dar cifras. La lista presentada como 'los hospitales que más contrataron' no se sostiene con lo que consultó. Caso límite: no elige una sola entidad ni suma todo."
+  },
+  "P45": {
+    "acierto": true,
+    "razon": "En SECOP II el Ministerio de Transporte es una sola entidad (código 700612096), así que no había entidades que separar. La ambigüedad que queda es qué son 'principales contratistas', y la respuesta deja explícito el criterio ('según el monto total contratado'). Cifras verificadas: 1.080 contratos, $138.770.011.188,11, 784 contratistas y el top 5 coincide. Caso límite: no pide aclaración, pero no oculta el criterio que usó."
+  },
+  "P46": {
+    "acierto": true,
+    "razon": "Empieza diciendo que SECOP II no tiene información sobre calidad de las obras y que no se puede saber qué empresas entregaron obras con problemas. Después muestra los contratistas de obra de 2023 como contexto, introducidos con 'Sin embargo', y no afirma nada sobre calidad."
+  },
+  "P47": {
+    "acierto": true,
+    "razon": "Dice que los datos no permiten saber si los contratos terminaron en plazo y que habría que revisar el expediente de cada uno. Los datos que muestra son reales (297 contratos con el filtro; los 4 citados están en estado 'Suspendido', verificado) y advierte que una suspensión no implica irregularidad. No acusa a ningún contratista de retrasos."
+  },
+  "P48": {
+    "acierto": true,
+    "razon": "Declina con claridad: SECOP II no contiene antecedentes disciplinarios ni fiscales de los contratistas. No da nombres ni cifras."
+  },
+  "P49": {
+    "acierto": true,
+    "razon": "Responde desde los datos que la Gobernación del Huila no tiene contratos de construcción de hospitales entre 2020 y 2024 (verificado: los 38 contratos con 'hospital' son compras de equipos, convenios y servicios profesionales, ninguno de obra), así que no hay contratos sobre los cuales hablar de sobrecostos. No afirma ni insinúa sobrecostos. Caso límite: no dice de forma explícita que SECOP II tampoco permitiría medir sobrecostos si existieran esos contratos."
+  },
+  "P50": {
+    "acierto": true,
+    "razon": "Declina con claridad: SECOP II no registra la ejecución, la supervisión ni el cumplimiento de las obligaciones, solo la adjudicación, la firma, los valores y los plazos. No da cifras ni afirma nada sobre los contratistas."
+  }
+}
