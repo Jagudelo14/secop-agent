@@ -12,6 +12,7 @@ __pycache__/
 .cache/
 evals/resultados/*
 !evals/resultados/20261118-085949*
+!evals/resultados/README.md
 !evals/resultados/definitiva*.log
 !evals/resultados/20261119-084906*
 !evals/resultados/20261119-155020*

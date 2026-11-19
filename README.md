@@ -212,7 +212,7 @@ En los dos casos el bucle está escrito a mano y el máximo es de 8 llamadas a h
 
 **En línea:** https://secop-agent-ehot3pjeatwtjlxesj4grr.streamlit.app
 
-La demo de Streamlit usa Gemini 3.5 Flash-Lite, el mismo modelo de la evaluación, con un límite de 5 preguntas por sesión. Los visitantes no ponen ninguna llave: la de Gemini va en los *secrets* de Streamlit Community Cloud, como en [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example) (`GEMINI_API_KEY`, `MODELGEMINI`, `GEMINI_RESPALDO` y, opcional, `SOCRATA_APP_TOKEN`), y la app los pasa a variables de entorno al arrancar. Oculta la cédula de las personas naturales. Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
+La demo de Streamlit usa Gemini 3.5 Flash-Lite, el mismo modelo de la evaluación, con un límite de 5 preguntas por sesión y un tope de 60 para toda la app por día (`DEMO_MAX_PREGUNTAS_DIA`), para que nadie agote la cuota gratuita recargando la página. Los visitantes no ponen ninguna llave: la de Gemini va en los *secrets* de Streamlit Community Cloud, como en [.streamlit/secrets.toml.example](.streamlit/secrets.toml.example) (`GEMINI_API_KEY`, `MODELGEMINI`, `GEMINI_RESPALDO` y, opcional, `SOCRATA_APP_TOKEN`), y la app los pasa a variables de entorno al arrancar. Oculta la cédula de las personas naturales. Si datos.gov.co está caído, `SECOP_MODO_DEMO=1` responde solo desde la caché en disco.
 
 ## Estructura
 
