@@ -165,7 +165,7 @@ Comparación honesta: la v3 sacó 30/30 con ejemplos del set en el prompt, y la 
 
 La v6 agrega las capacidades C1 a C8 (rangos de años, búsqueda en el objeto, agrupar por ciudad y sector, promedio, contratistas distintos, tipo de persona, duración, varias entidades y robustez ante errores de red). Se decidieron leyendo los temas del set definitivo de 50 preguntas, antes de correr el agente sobre él. El detalle, el protocolo y los resultados están en [evaluacion-definitiva.md](evaluacion-definitiva.md).
 
-Antes de los cambios se guardó una copia exacta de la v5 en `evals/linea_base/` para correr la línea base. Después decidí cancelar esa línea base.
+Antes de los cambios guardé una copia exacta de la v5 para correr una línea base sobre el set definitivo. Después decidí cancelar esa línea base y borré la copia del repositorio.
 
 ## Iteración 7 — v7, verificación con el agente completo
 

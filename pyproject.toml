@@ -6,8 +6,9 @@
 
 [project]
 name = "secop-agent"
-version = "0.1.0"
+version = "1.0.0"
 description = "Agente que responde preguntas sobre contratos públicos de SECOP II y marca patrones para revisar"
+license = "MIT"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [

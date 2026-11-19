@@ -237,6 +237,6 @@ secop-agent/
 └── docs/                 # esquema, versiones del prompt y evaluación definitiva
 ```
 
-## Datos
+## Datos y licencia
 
-[SECOP II – Contratos Electrónicos](https://www.datos.gov.co/d/jbjy-vk9h), Colombia Compra Eficiente, licencia CC BY-SA 4.0.
+El código está bajo licencia [MIT](LICENSE). Los datos son de [SECOP II – Contratos Electrónicos](https://www.datos.gov.co/d/jbjy-vk9h), de Colombia Compra Eficiente, con licencia CC BY-SA 4.0. Las cédulas de personas naturales que aparecen en los resultados de evaluación están enmascaradas y los datos de prueba (`tests/fixtures/`) usan personas ficticias.

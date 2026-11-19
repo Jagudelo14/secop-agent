@@ -74,13 +74,7 @@ Las preguntas de conteo, ranking y filtro se califican automáticamente con `eva
 
 ### Línea base (cancelada)
 
-- **Copia congelada:** `evals/linea_base/secop_agent/`, guardada el 2026-11-16 a las 16:04, antes de tocar el código para las capacidades nuevas.
-- **Huella SHA-256** del conjunto de archivos `.py`: `89086f8394611fbb1a13924701248c2bc843c9fd72eb0447f2305d9208ccd6a4`
-- **No se usó:** se canceló antes de responder la segunda pregunta (ver cambio de protocolo). El comando que se iba a usar era:
-
-```
-PYTHONPATH=evals/linea_base python -m uv run python -u -X utf8 evals/run.py --preguntas evals/preguntas_definitivas.jsonl
-```
+Antes de agregar las capacidades nuevas guardé una copia del agente v5 para correrla como línea base sobre este set. La cancelé antes de que respondiera la segunda pregunta, para que el set se usara solo en la medición final, y borré esa respuesta sin leerla ni calificarla. La copia ya no está en el repositorio; queda en el historial de git, en `v0.5.0`.
 
 ### Capacidades implementadas (agente v6)
 

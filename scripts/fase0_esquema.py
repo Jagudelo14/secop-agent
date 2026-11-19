@@ -19,6 +19,8 @@ load_dotenv()
 
 CARPETA_DOCS = Path(__file__).resolve().parent.parent / "docs"
 FILAS_MUESTRA = 1000
+# columnas con nombres, documentos o cuentas de personas; no van de ejemplo en docs
+PATRON_PERSONAL = re.compile(r"documento|proveedor_adjudicado|nombre_(representante|ordenador|supervisor)|identificaci|domicilio|cuenta")
 
 
 # ### Formato por columna ###
@@ -54,7 +56,7 @@ def perfilar(metadatos, filas):
             "formato_json": detectar_formato(presentes),
             "pct_nulos": round(100 * (1 - len(presentes) / max(len(filas), 1)), 1),
             "valores_distintos_muestra": len(distintos),
-            "ejemplo": presentes[0] if presentes else None,
+            "ejemplo": ("[dato personal oculto]" if PATRON_PERSONAL.search(nombre) else presentes[0]) if presentes else None,
             "usada_por_el_agente": nombre in COLUMNAS_CONTRATO,
         })
     return columnas
