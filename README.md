@@ -40,7 +40,7 @@ flowchart LR
     CLI["CLI<br/>python -m secop_agent"] --> AG
     WEB["Demo Streamlit"] --> AG
     AG["agent.py<br/>bucle tool use"] --> T
-    MCP["mcp_server.py<br/>Claude Desktop"] --> T
+    MCP["mcp_server.py<br/>Claude Code o Desktop"] --> T
     T["tools.py<br/>5 herramientas"] --> AL["alerts.py<br/>4 señales en pandas"]
     T --> SC["socrata.py<br/>paginación, reintentos, caché"]
     SC --> API[("datos.gov.co<br/>jbjy-vk9h")]
@@ -130,9 +130,24 @@ uv run python evals/run.py --preguntas evals/preguntas_definitivas.jsonl
 uv run python evals/run.py --verificar evals/resultados/<corrida>.jsonl  # solo recalifica
 ```
 
-## Servidor MCP en Claude Desktop
+## Servidor MCP
 
-El servidor publica las cinco herramientas con el mismo esquema y la misma descripción que ve el agente, y una prueba ([tests/test_mcp_server.py](tests/test_mcp_server.py)) verifica que no se desincronicen. Para usarlo, en `claude_desktop_config.json`:
+El servidor publica las cinco herramientas con el mismo esquema y la misma descripción que ve el agente, y una prueba ([tests/test_mcp_server.py](tests/test_mcp_server.py)) verifica que no se desincronicen. Corre en local por stdio, así que funciona con clientes que se instalan en el equipo. Claude en la web (claude.ai) no puede usarlo tal cual, porque solo se conecta a servidores MCP publicados con una URL `https://`.
+
+### Claude Code
+
+```bash
+claude mcp add -s user secop-ii -- uv --directory "C:/ruta/a/secop-agent" run secop-mcp
+claude mcp list   # debe decir secop-ii ... Connected
+```
+
+`-s user` lo deja disponible en cualquier carpeta; sin esa opción solo aparece en la carpeta donde se corrió el comando. Después hay que abrir una conversación nueva (en VS Code, recargar la ventana) y revisar con `/mcp` que esté conectado. Cuando se usa, las llamadas aparecen como `secop-ii [buscar_entidad]`, `secop-ii [agregar]`, etc.
+
+Con la extensión de VS Code el comando `claude` no queda en la terminal. El ejecutable está dentro de la extensión, en `%USERPROFILE%\.vscode\extensions\anthropic.claude-code-<versión>\resources\native-binary\claude.exe`.
+
+### Claude Desktop
+
+En Settings → Developer → Edit Config, dentro de `claude_desktop_config.json`:
 
 ```json
 {
@@ -144,6 +159,8 @@ El servidor publica las cinco herramientas con el mismo esquema y la misma descr
   }
 }
 ```
+
+Si el cliente no encuentra `uv`, se pone la ruta completa del ejecutable (en Windows, por ejemplo, `C:/Users/<usuario>/AppData/Local/Programs/Python/Python313/Scripts/uv.exe`). Hay que cerrar Claude Desktop por completo y volver a abrirlo; el servidor aparece en Settings → Developer.
 
 ## Modelos y costo
 
